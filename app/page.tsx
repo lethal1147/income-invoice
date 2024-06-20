@@ -11,12 +11,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { LoginBodySchemaType, loginBodySchema } from "@/schema/login";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
 import { useForm } from "react-hook-form";
 import "./globals.css";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { login } from "./actions/user";
+import { signIn } from "next-auth/react";
 
 export default function Home() {
   const form = useForm<LoginBodySchemaType>({
@@ -62,15 +60,9 @@ export default function Home() {
               </FormItem>
             )}
           />
-          {/* <div className="flex justify-between"> */}
-          {/* <div className="flex items-center space-x-2">
-              <Checkbox id="persists" />
-              <Label htmlFor="persists">Remember me</Label>
-            </div> */}
           <Button className="self-end px-0 underline" variant="link">
             Forget your password
           </Button>
-          {/* </div> */}
           <Button>Login</Button>
           <div className="relative flex items-center my-2">
             <div className="h-0.5 w-full bg-gray-200" />
@@ -79,6 +71,13 @@ export default function Home() {
             </span>
           </div>
           <Button variant="outline">Login with Google</Button>
+          <Button
+            type="button"
+            onClick={() => signIn("github")}
+            variant="outline"
+          >
+            Login with Github
+          </Button>
           <div className="flex items-center gap-1 justify-center">
             <span>Don&apos;t have an account?</span>
             <Button className="underline px-0" variant="link">
