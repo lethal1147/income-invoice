@@ -1,4 +1,4 @@
-import NavMenu from "@/components/navMenu";
+import NavMenu from "@/components/sidebar/navMenu";
 
 export default function Dashboard() {
   return (

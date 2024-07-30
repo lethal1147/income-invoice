@@ -13,8 +13,9 @@ import { LoginBodySchemaType, loginBodySchema } from "@/schema/login";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import "./globals.css";
-import { login } from "./actions/user";
+import { login } from "./actions/auth";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 
 export default function Home() {
   const form = useForm<LoginBodySchemaType>({
@@ -22,10 +23,7 @@ export default function Home() {
   });
 
   const onSubmit = form.handleSubmit(async (data) => {
-    const formData = new FormData();
-    formData.append("email", data.email);
-    formData.append("password", data.password);
-    const test = await login(formData);
+    await login(data);
   });
 
   return (
@@ -70,7 +68,13 @@ export default function Home() {
               OR
             </span>
           </div>
-          <Button variant="outline">Login with Google</Button>
+          <Button
+            type="button"
+            onClick={() => signIn("google")}
+            variant="outline"
+          >
+            Login with Google
+          </Button>
           <Button
             type="button"
             onClick={() => signIn("github")}
@@ -80,8 +84,8 @@ export default function Home() {
           </Button>
           <div className="flex items-center gap-1 justify-center">
             <span>Don&apos;t have an account?</span>
-            <Button className="underline px-0" variant="link">
-              Sign up
+            <Button asChild className="underline px-0" variant="link">
+              <Link href="/register">Sign up</Link>
             </Button>
           </div>
         </form>
