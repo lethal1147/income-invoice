@@ -35,8 +35,6 @@ export default function NavMenu() {
     getWalletListHandler();
   }, [session?.user?.id]);
 
-  console.log(wallet);
-
   return (
     <aside className="min-h-screen bg-gray-200 w-52 p-5 flex flex-col gap-3">
       <div className="w-full">

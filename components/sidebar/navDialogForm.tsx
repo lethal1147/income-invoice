@@ -36,6 +36,7 @@ export default function NavDialogForm() {
 
   const onSubmitHandler = async (data: WalletSchemaType) => {
     const res = await createWallet(data);
+    console.log(res)
   };
 
   return (

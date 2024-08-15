@@ -35,7 +35,7 @@ const useWalletStore = create<WalletState>()((set) => ({
         walletList: response.data,
       });
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   },
 }));

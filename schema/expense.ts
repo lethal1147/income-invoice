@@ -21,6 +21,8 @@ export const expenseBodySchema = z.object({
   userId: z.string(),
 });
 
+export type ExpenseSchema = z.infer<typeof expenseBodySchema>;
+
 export const createExpenseBodySchema = expenseBodySchema.omit({ id: true });
 
 export type CreateExpenseBodySchema = z.infer<typeof createExpenseBodySchema>;

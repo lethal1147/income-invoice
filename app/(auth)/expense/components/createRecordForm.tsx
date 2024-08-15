@@ -1,5 +1,6 @@
 "use client";
 
+import { createExpense } from "@/app/actions/expense";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/datePicker";
 import {
@@ -17,6 +18,7 @@ import {
   CreateExpenseBodySchema,
   createExpenseBodySchema,
 } from "@/schema/expense";
+import useTagStore from "@/stores/tagStore";
 import useWalletStore from "@/stores/walletStore";
 import { OptionType } from "@/types/utilsType";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,26 +38,30 @@ export default function CreateRecordForm() {
     },
   });
   const { walletDropdown } = useWalletStore();
+  const { tagsDropdown, getTags } = useTagStore();
 
   const onSubmitHandler = async (data: CreateExpenseBodySchema) => {
-    console.log(data);
+    try {
+      const result = await createExpense(data);
+      console.log(result);
+    } catch (err) {
+      console.error(err);
+    }
   };
-
-  const onErr = (err) => {
-    console.log(err);
-  };
-  console.log(form.watch());
 
   useEffect(() => {
+    if (!session) return;
+
     form.reset({
       userId: session?.user?.id,
     });
+    getTags(session?.user?.id as string);
   }, [session?.user?.id]);
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmitHandler, onErr)}
+        onSubmit={form.handleSubmit(onSubmitHandler)}
         className="flex flex-col gap-5"
       >
         <div>
@@ -132,7 +138,7 @@ export default function CreateRecordForm() {
                     onChange={(newVal: MultiValue<OptionType>) =>
                       field.onChange(newVal)
                     }
-                    options={EXPENSE_TYPE_DROPDOWNS}
+                    options={tagsDropdown}
                     placeholder="Tags"
                     styles={customStyles}
                     isMulti

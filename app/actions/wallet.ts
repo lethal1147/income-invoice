@@ -30,11 +30,7 @@ export async function createWallet(body: WalletSchemaType) {
   }
 }
 
-export async function getWalletListByUserId(userId: string): Promise<{
-  error: boolean;
-  message?: string;
-  data: WalletSchemaTypeWithId[];
-}> {
+export async function getWalletListByUserId(userId: string) {
   if (!userId) {
     return { error: true, message: "User id is missing", data: [] };
   }
