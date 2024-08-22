@@ -7,14 +7,14 @@ export async function getTagsByUserId(userId: string) {
     return { error: true, message: "User id is required." };
   }
 
-  const tags = await db.tag.findMany({
-    where: {
-      userId,
-    },
-  });
-
-  return { error: false, message: "Get all tags for user", tags };
   try {
+    const tags = await db.tag.findMany({
+      where: {
+        userId,
+      },
+    });
+
+    return { error: false, message: "Get all tags for user", tags };
   } catch (err) {
     return { error: true, message: err };
   }

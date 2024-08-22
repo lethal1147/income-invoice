@@ -1,12 +1,9 @@
 "use client";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 import { Button } from "../ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import Image from "next/image";
-import { signOut } from "@/auth";
 import { signOutAction } from "@/app/actions/auth";
 import NavMenuUserDetail from "./navMenuUserDetail";
 import {
@@ -16,8 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
-import { Form } from "../ui/form";
 import NavDialogForm from "./navDialogForm";
 import useWalletStore from "@/stores/walletStore";
 import { useSession } from "next-auth/react";
@@ -54,6 +49,7 @@ export default function NavMenu() {
             ))}
           </SelectContent>
         </Select>
+        {}
       </div>
 
       <Link

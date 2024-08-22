@@ -40,5 +40,6 @@ export async function getWalletListByUserId(userId: string) {
       userId,
     },
   });
+  console.log(walletList);
   return { error: false, data: walletList };
 }

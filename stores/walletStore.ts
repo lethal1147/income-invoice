@@ -25,14 +25,14 @@ const useWalletStore = create<WalletState>()((set) => ({
   getWalletList: async (userId: string) => {
     try {
       const response = await getWalletListByUserId(userId);
-      if (response.error) throw new Error(response.message);
+      if (response.error || !response.data) throw new Error(response.message);
 
       set({
         walletDropdown: response.data?.map((wal) => ({
           value: wal.id,
           label: wal.name,
         })),
-        walletList: response.data,
+        walletList: response.data as WalletSchemaTypeWithId[],
       });
     } catch (err) {
       console.error(err);

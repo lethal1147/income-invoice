@@ -25,8 +25,6 @@ import { Ellipsis } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { customStyles } from "@/configs/style";
 import { EXPENSE_TYPE_DROPDOWNS } from "@/constant/dropdown";
-import { DatePicker } from "@/components/ui/datePicker";
-import { Textarea } from "@/components/ui/textarea";
 import useWalletStore from "@/stores/walletStore";
 import CreateRecordForm from "./components/createRecordForm";
 import useExpenseStore from "@/stores/expenseStore";
@@ -36,67 +34,127 @@ import { apiStatus } from "@/constant/status";
 import Loader from "@/components/common/loader";
 import TablePagination from "@/components/common/tablePagination";
 import usePagination from "@/hooks/usePagination";
-import {
-  formatCurrencyDollar,
-  formatDateDefault,
-  formatCurrencyThaiBath,
-} from "@/utils/formatter";
+import { formatDateDefault, formatCurrencyThaiBath } from "@/utils/formatter";
 import { cn } from "@/lib/utils";
+import { DatePickerWithRange } from "@/components/ui/datePickerRange";
+import dayjs from "dayjs";
+import { OptionType } from "@/types/utilsType";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ExpenseWithInclude } from "@/types/expenseType";
+
+type Types = "e" | "i" | undefined;
+
+type FilterQuery = {
+  name?: string;
+  tags?: string;
+  type?: Types;
+};
 
 export default function Page() {
   const { data: session } = useSession();
   const { wallet } = useWalletStore();
-  const { expenses, getExpenseByUserId } = useExpenseStore();
+  const { expenses, getExpenseByUserId, totalExpenses } = useExpenseStore();
   const { isPending, setStatus } = useStatus(apiStatus.PENDING);
-  const [filterQuery, setFilterQuery] = useState({
-    date: null,
+  const [filterQuery, setFilterQuery] = useState<FilterQuery>({
     name: "",
-    walletId: "",
-    type: null,
+    type: undefined,
+    tags: "",
   });
-  const [totalDocs, setTotalDocs] = useState(0);
+  const [filterDate, setFilterDate] = useState({
+    from: dayjs().startOf("month").toDate(),
+    to: dayjs().endOf("month").toDate(),
+  });
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [updateExpense, setUpdateExpense] = useState<null | ExpenseWithInclude>(
+    null
+  );
+
   const {
     page,
     pageLimit,
     handlerNextPage,
     handlerPrevPage,
     handlerLimitChange,
-  } = usePagination({ size: totalDocs });
+  } = usePagination({ size: totalExpenses });
 
   useEffect(() => {
-    if (!session?.user?.id) return;
     setStatus(apiStatus.PENDING);
-    getExpenseByUserId(session?.user?.id, {
-      walletId: wallet?.id,
-      page,
-      pageLimit,
-    });
-    setStatus(apiStatus.SUCCESS);
-  }, [session?.user?.id]);
+    const debounce = setTimeout(() => {
+      if (!session?.user?.id) return;
+      getExpenseByUserId(session?.user?.id, {
+        walletId: wallet?.id,
+        page,
+        pageLimit,
+        date: filterDate,
+        tags: filterQuery.tags,
+        name: filterQuery.name,
+        type: filterQuery.type,
+      });
+      setStatus(apiStatus.SUCCESS);
+    }, 500);
 
-  console.log(expenses);
+    return () => {
+      clearTimeout(debounce);
+    };
+  }, [session?.user?.id, page, pageLimit, filterDate, filterQuery]);
 
   return (
     <div className="flex text-gray-800">
       <NavMenu />
-      <Sheet>
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <div className="p-10 gap-10 flex flex-col w-full loginBackGround">
           <div className="bg-white border p-3 w-full rounded-md flex items-end justify-between gap-5">
             <div className="grow">
               <Label htmlFor="name">Name</Label>
-              <Input id="name" placeholder="Name" />
+              <Input
+                onChange={(e) =>
+                  setFilterQuery((prev) => ({ ...prev, name: e.target.value }))
+                }
+                id="name"
+                placeholder="Name"
+              />
             </div>
-            <div className="grow">
+            <div className="grow flex flex-col">
               <Label htmlFor="name">Date</Label>
-              <DatePicker onChange={(val) => null} />
+              <div className="grow">
+                <DatePickerWithRange
+                  value={filterDate}
+                  onSelect={setFilterDate}
+                />
+              </div>
             </div>
             <div className="grow">
               <Label htmlFor="name">Tags</Label>
-              <Input id="name" placeholder="Name" />
+              <Input
+                onChange={(e) =>
+                  setFilterQuery((prev) => ({ ...prev, tags: e.target.value }))
+                }
+                value={filterQuery.tags}
+                id="tags"
+                placeholder="Tag name"
+              />
             </div>
             <div className="grow">
               <Label htmlFor="name">Type</Label>
-              <Input id="name" placeholder="Name" />
+              <Select
+                value={EXPENSE_TYPE_DROPDOWNS.find(
+                  (opt) => opt.value === filterQuery.type
+                )}
+                onChange={(val: OptionType) =>
+                  setFilterQuery((prev) => ({
+                    ...prev,
+                    type: val.value as Types,
+                  }))
+                }
+                options={EXPENSE_TYPE_DROPDOWNS}
+                placeholder="Type"
+                styles={customStyles}
+              />
             </div>
             <SheetTrigger asChild>
               <Button>+ Add record</Button>
@@ -135,7 +193,18 @@ export default function Page() {
                         {formatDateDefault(exp.date)}
                       </TableCell>
                       <TableCell className="w-[40%]">{exp.title}</TableCell>
-                      <TableCell className="w-[25%]">ขนม</TableCell>
+                      <TableCell className="w-[25%]">
+                        <div className="flex gap-2">
+                          {exp.expenseTag.map((tag) => (
+                            <div
+                              key={tag.id}
+                              className="w-auto px-5 py-1 rounded-lg bg-gray-200"
+                            >
+                              <p>{tag.tag.name}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </TableCell>
                       <TableCell
                         className={cn("text-right w-[10%]", {
                           "text-red-500": exp.type === "e",
@@ -147,8 +216,25 @@ export default function Page() {
                           : `+${formatCurrencyThaiBath(exp.total)}`}
                       </TableCell>
                       <TableCell className="w-[10%] text-center">
-                        <div className="flex justify-center ">
-                          <Ellipsis />
+                        <div className="flex justify-center">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger>
+                              <div className=" size-8 flex justify-center items-center hover:bg-gray-200 cursor-pointer rounded-full">
+                                <Ellipsis />
+                              </div>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setUpdateExpense(exp);
+                                  setIsSheetOpen(true);
+                                }}
+                              >
+                                แก้ไข
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>ลบ</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -162,7 +248,7 @@ export default function Page() {
                       handlerPageLimitChange={handlerLimitChange}
                       handlerNextPage={handlerNextPage}
                       handlerPrevPage={handlerPrevPage}
-                      totalDocs={totalDocs}
+                      totalDocs={totalExpenses}
                       page={page}
                       pageLimit={pageLimit}
                     />
@@ -175,8 +261,7 @@ export default function Page() {
 
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>Add new transaction</SheetTitle>
-            <CreateRecordForm />
+            <CreateRecordForm updateExpense={updateExpense} />
           </SheetHeader>
         </SheetContent>
       </Sheet>
