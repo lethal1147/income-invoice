@@ -65,7 +65,7 @@ model Tag {
 
 model ExpenseTag {
   id String @id @default(uuid())
-  expense Expense @relation(fields: [expenseId], references: [id])
+  expense Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
   expenseId String
   tag Tag @relation(fields: [tagId], references: [id])
   tagId String

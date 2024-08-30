@@ -13,12 +13,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
 import { customStyles } from "@/configs/style";
 import { EXPENSE_TYPE_DROPDOWNS } from "@/constant/dropdown";
 import {
   CreateExpenseBodySchema,
   createExpenseBodySchema,
 } from "@/schema/expense";
+import useExpenseStore from "@/stores/expenseStore";
 import useTagStore from "@/stores/tagStore";
 import useWalletStore from "@/stores/walletStore";
 import { ExpenseWithInclude } from "@/types/expenseType";
@@ -32,10 +34,12 @@ import CreatableSelect from "react-select/creatable";
 
 type CreateRecordFormProps = {
   updateExpense: null | ExpenseWithInclude;
+  closeSheet: () => void;
 };
 
 export default function CreateRecordForm({
   updateExpense,
+  closeSheet,
 }: CreateRecordFormProps) {
   const isEditMode = !!updateExpense;
   const { data: session } = useSession();
@@ -46,16 +50,26 @@ export default function CreateRecordForm({
       userId: session?.user?.id,
     },
   });
+  const { getExpenseByUserId } = useExpenseStore();
   const { walletDropdown } = useWalletStore();
   const { tagsDropdown, getTags } = useTagStore();
+  const { toast } = useToast();
 
   const onSubmitHandler = async (data: CreateExpenseBodySchema) => {
+    if (!session?.user?.id) return;
     try {
+      let result;
       if (isEditMode) {
-        const result = await updateExpenseById(updateExpense.id, data);
-        console.log(result);
+        result = await updateExpenseById(updateExpense.id, data);
       } else {
-        const result = await createExpense(data);
+        result = await createExpense(data);
+      }
+      if (!result.error) {
+        closeSheet();
+        getExpenseByUserId(session?.user?.id);
+        toast({
+          title: "✅ Create transaction successfully!",
+        });
       }
     } catch (err) {
       console.error(err);
@@ -224,7 +238,7 @@ export default function CreateRecordForm({
               )}
             />
           </div>
-          <Button type="submit">Create</Button>
+          <Button type="submit">{isEditMode ? "Update" : "Create"}</Button>
         </form>
       </Form>
     </>

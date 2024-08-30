@@ -46,6 +46,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ExpenseWithInclude } from "@/types/expenseType";
+import { useToast } from "@/components/ui/use-toast";
+import ConfirmDeleteDialog from "./components/confirmDeleteDialog";
 
 type Types = "e" | "i" | undefined;
 
@@ -58,7 +60,12 @@ type FilterQuery = {
 export default function Page() {
   const { data: session } = useSession();
   const { wallet } = useWalletStore();
-  const { expenses, getExpenseByUserId, totalExpenses } = useExpenseStore();
+  const {
+    expenses,
+    getExpenseByUserId,
+    totalExpenses,
+    deleteExpenseByExpenseId,
+  } = useExpenseStore();
   const { isPending, setStatus } = useStatus(apiStatus.PENDING);
   const [filterQuery, setFilterQuery] = useState<FilterQuery>({
     name: "",
@@ -70,9 +77,12 @@ export default function Page() {
     to: dayjs().endOf("month").toDate(),
   });
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [updateExpense, setUpdateExpense] = useState<null | ExpenseWithInclude>(
     null
   );
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const {
     page,
@@ -102,6 +112,33 @@ export default function Page() {
       clearTimeout(debounce);
     };
   }, [session?.user?.id, page, pageLimit, filterDate, filterQuery]);
+
+  const onDelete = async () => {
+    try {
+      if (!deleteTarget) return;
+      setStatus(apiStatus.PENDING);
+      deleteExpenseByExpenseId(deleteTarget);
+      if (session?.user?.id) {
+        getExpenseByUserId(session?.user?.id, {
+          walletId: wallet?.id,
+          page,
+          pageLimit,
+          date: filterDate,
+          tags: filterQuery.tags,
+          name: filterQuery.name,
+          type: filterQuery.type,
+        });
+      }
+      setStatus(apiStatus.SUCCESS);
+      toast({
+        title: "Delete transaction successfully.",
+      });
+      return true;
+    } catch (err) {
+      setStatus(apiStatus.ERROR);
+      return false;
+    }
+  };
 
   return (
     <div className="flex text-gray-800">
@@ -156,9 +193,15 @@ export default function Page() {
                 styles={customStyles}
               />
             </div>
-            <SheetTrigger asChild>
-              <Button>+ Add record</Button>
-            </SheetTrigger>
+            <Button
+              onClick={() => {
+                setUpdateExpense(null);
+                setIsSheetOpen(true);
+              }}
+              type="button"
+            >
+              + Add record
+            </Button>
           </div>
 
           <div className="w-full bg-white border rounded-md h-full">
@@ -232,7 +275,14 @@ export default function Page() {
                               >
                                 แก้ไข
                               </DropdownMenuItem>
-                              <DropdownMenuItem>ลบ</DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setDeleteTarget(exp.id);
+                                  setIsDialogOpen(true);
+                                }}
+                              >
+                                ลบ
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
@@ -261,10 +311,21 @@ export default function Page() {
 
         <SheetContent>
           <SheetHeader>
-            <CreateRecordForm updateExpense={updateExpense} />
+            <CreateRecordForm
+              closeSheet={() => setIsSheetOpen(false)}
+              updateExpense={updateExpense}
+            />
           </SheetHeader>
         </SheetContent>
       </Sheet>
+
+      <ConfirmDeleteDialog
+        onConfirm={onDelete}
+        open={isDialogOpen}
+        setOpen={setIsDialogOpen}
+        title="Are you sure?"
+        description=" This action cannot be undone. This will permanently delete your transaction."
+      />
     </div>
   );
 }

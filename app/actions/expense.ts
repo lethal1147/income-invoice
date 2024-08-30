@@ -152,7 +152,7 @@ export async function updateExpenseById(
         });
       }
 
-      const updatedExpense = await prisma.expense.update({
+      await prisma.expense.update({
         where: {
           id,
         },
@@ -166,13 +166,12 @@ export async function updateExpenseById(
           walletId,
         },
       });
-
-      return {
-        error: false,
-        message: "Update expense successfully.",
-        updatedExpense,
-      };
     });
+
+    return {
+      error: false,
+      message: "Update expense successfully.",
+    };
   } catch (err) {
     return {
       error: true,
@@ -229,6 +228,9 @@ export async function getExpenseByUserId(
       where: whereQuery,
       skip: (page - 1) * pageLimit,
       take: pageLimit,
+      orderBy: {
+        date: "desc",
+      },
     });
     const totalExpenses = await db.expense.count({
       where: whereQuery,
@@ -242,6 +244,17 @@ export async function getExpenseByUserId(
     };
   } catch (err) {
     console.log(err);
+    return { error: true, message: formatErrorMessage(err) };
+  }
+}
+
+export async function deleteExpenseByExpenseId(expenseId: string) {
+  try {
+    await prisma?.expense.delete({
+      where: { id: expenseId },
+    });
+    return { error: false, message: "Delete expense successfully." };
+  } catch (err) {
     return { error: true, message: formatErrorMessage(err) };
   }
 }
