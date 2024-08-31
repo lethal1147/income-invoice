@@ -5,9 +5,13 @@ import {
   CreateExpenseBodySchema,
   createExpenseBodySchema,
 } from "@/schema/expense";
-import { ExpenseQueryOption } from "@/types/expenseType";
+import {
+  ExpenseQueryOption,
+  ExpenseSummaryDataType,
+} from "@/types/expenseType";
 import { formatErrorMessage } from "@/utils/formatter";
 import { Prisma } from "@prisma/client";
+import { error } from "console";
 import dayjs from "dayjs";
 
 export async function createExpense(body: CreateExpenseBodySchema) {
@@ -256,5 +260,154 @@ export async function deleteExpenseByExpenseId(expenseId: string) {
     return { error: false, message: "Delete expense successfully." };
   } catch (err) {
     return { error: true, message: formatErrorMessage(err) };
+  }
+}
+
+export async function getExpenseSummary(userId: string): Promise<{
+  error: boolean;
+  data: ExpenseSummaryDataType[];
+  message?: string;
+}> {
+  try {
+    const summary = [];
+
+    for (let month = 0; month < 12; month++) {
+      const startDate = dayjs()
+        .month(month)
+        .startOf("month")
+        .add(7, "hour")
+        .toDate();
+      const endDate = dayjs()
+        .month(month)
+        .endOf("month")
+        .add(7, "hour")
+        .toDate();
+      const expenses = await prisma?.expense.groupBy({
+        by: ["type"],
+        _sum: {
+          total: true,
+        },
+        where: {
+          userId,
+          date: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+      });
+
+      let income = 0;
+      let expense = 0;
+
+      expenses?.forEach((exp) => {
+        if (exp.type === "i") {
+          income = exp._sum.total ?? 0;
+        } else {
+          expense = exp._sum.total ?? 0;
+        }
+      });
+
+      summary.push({
+        month: dayjs(startDate).format("MMMM"),
+        income,
+        expense,
+      });
+    }
+
+    return { error: false, data: summary };
+  } catch (err) {
+    return { error: true, data: [], message: formatErrorMessage(err) };
+  }
+}
+
+type ReturnOfSummaryTag = { tagname: string; totalamount: number };
+
+export async function getSummaryTags(
+  userId: string,
+  filter: { startDate: Date; endDate: Date }
+): Promise<{
+  error: boolean;
+  data: { [key: string]: number };
+  message?: string;
+  totalIncome: number;
+  totalExpense: number;
+}> {
+  try {
+    if (!prisma)
+      return {
+        error: true,
+        data: {},
+        message: "Database not initial.",
+        totalIncome: 0,
+        totalExpense: 0,
+      };
+    const startDate = dayjs(filter.startDate)
+      .startOf("day")
+      .add(7, "hour")
+      .toDate();
+    const endDate = dayjs(filter.endDate).endOf("day").add(7, "hour").toDate();
+
+    const result: ReturnOfSummaryTag[] = await prisma.$queryRaw`
+    SELECT t."name" AS tagName, CAST(SUM(e.total) AS INTEGER) AS totalAmount FROM "Expense" e
+    LEFT JOIN "ExpenseTag" et ON e.id = et."expenseId"
+    LEFT JOIN "Tag" t ON et."tagId" = t.id
+    WHERE e."date" BETWEEN ${startDate} AND ${endDate} AND e."userId" = ${userId} AND e."type" = 'e'
+    GROUP BY t."name"
+    ORDER BY totalAmount DESC
+  `;
+
+    const totalIncome = await prisma.expense.aggregate({
+      where: {
+        type: "i",
+        date: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      _sum: {
+        total: true,
+      },
+    });
+    const totalExpense = await prisma.expense.aggregate({
+      where: {
+        type: "e",
+        date: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      _sum: {
+        total: true,
+      },
+    });
+
+    const tagTotals: { [key: string]: number } = {};
+    let othersTotal = 0;
+    result.forEach((row: ReturnOfSummaryTag, index: number) => {
+      if (index < 4) {
+        tagTotals[row.tagname] = row.totalamount;
+      } else {
+        othersTotal += row.totalamount;
+      }
+    });
+
+    if (othersTotal > 0) {
+      tagTotals["others"] = othersTotal;
+    }
+
+    return {
+      error: false,
+      data: tagTotals,
+      totalIncome: totalIncome._sum.total ?? 0,
+      totalExpense: totalExpense._sum.total ?? 0,
+    };
+  } catch (err) {
+    return {
+      error: true,
+      data: {},
+      totalIncome: 0,
+      totalExpense: 0,
+      message: formatErrorMessage(err),
+    };
   }
 }

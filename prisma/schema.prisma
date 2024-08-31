@@ -37,6 +37,8 @@ model Wallet {
   expenses Expense[]
   user User @relation(fields: [userId], references: [id])
   userId String
+
+  @@index([userId])
 }
 
 model Expense {
@@ -53,6 +55,9 @@ model Expense {
   expenseTag ExpenseTag[]
   wallet Wallet @relation(fields: [walletId], references: [id])
   walletId String
+
+   @@index([userId])
+   @@index([date])
 }
 
 model Tag {
@@ -61,6 +66,8 @@ model Tag {
   user User @relation(fields: [userId], references: [id])
   userId String
   expenseTag ExpenseTag[]
+  
+   @@index([userId])
 }
 
 model ExpenseTag {

@@ -56,7 +56,8 @@ export default function NavMenu() {
         className={cn(
           "px-5 py-3 rounded-md transition hover:bg-gray-300 w-full",
           {
-            "bg-gray-400 hover:bg-gray-400": location.startsWith("/dashboard"),
+            "bg-green-main text-white hover:bg-green-main":
+              location.startsWith("/dashboard"),
           }
         )}
         href={"/dashboard"}
@@ -67,12 +68,13 @@ export default function NavMenu() {
         className={cn(
           "px-5 py-3 rounded-md transition hover:bg-gray-300 w-full",
           {
-            "bg-gray-400 hover:bg-gray-400": location.startsWith("/expense"),
+            "bg-green-main text-white hover:bg-green-main":
+              location.startsWith("/expense"),
           }
         )}
         href={"/expense"}
       >
-        Expense
+        Transactions
       </Link>
 
       <form className="mt-auto px-0 mx-auto " action={signOutAction}>

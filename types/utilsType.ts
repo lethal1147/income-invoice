@@ -16,3 +16,5 @@ export interface FilterQuery {
   page?: number;
   pageLimit?: number;
 }
+
+export type CurrentFilterStateType = "month" | "quarter" | "year" | "custom";

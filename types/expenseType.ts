@@ -29,3 +29,9 @@ export interface ExpenseWhereQuery {
   expenseTag?: Prisma.ExpenseTagListRelationFilter;
   walletId?: Prisma.WalletRelationFilter;
 }
+
+export type ExpenseSummaryDataType = {
+  month: string;
+  income: number;
+  expense: number;
+};
