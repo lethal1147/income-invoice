@@ -51,7 +51,7 @@ export default function CreateRecordForm({
     },
   });
   const { getExpenseByUserId } = useExpenseStore();
-  const { walletDropdown } = useWalletStore();
+  const { walletDropdown, updateWallet } = useWalletStore();
   const { tagsDropdown, getTags } = useTagStore();
   const { toast } = useToast();
 
@@ -65,6 +65,7 @@ export default function CreateRecordForm({
         result = await createExpense(data);
       }
       if (!result.error) {
+        updateWallet(data.walletId);
         closeSheet();
         getExpenseByUserId(session?.user?.id);
         toast({

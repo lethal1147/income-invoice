@@ -225,9 +225,7 @@ export default function Dashboard() {
           >
             <ResizablePanel defaultSize={50}>
               <div className="flex flex-col h-full">
-                <h2 className="text-3xl font-extrabold p-5">
-                  Overview this year
-                </h2>
+                <h2 className="text-xl font-bold p-5">Overview this year</h2>
                 {isPending ? (
                   <div className="size-full flex justify-center items-center">
                     <Loader />
@@ -258,7 +256,7 @@ export default function Dashboard() {
             <ResizableHandle />
             <ResizablePanel defaultSize={50}>
               <div className="flex flex-col items-center h-full">
-                <h2 className=" self-start text-3xl font-extrabold px-5 pt-5">
+                <h2 className=" self-start text-xl font-bold px-5 pt-5">
                   Total spend on
                 </h2>
                 {isPendingTag ? (

@@ -11,7 +11,6 @@ import {
 } from "@/types/expenseType";
 import { formatErrorMessage } from "@/utils/formatter";
 import { Prisma } from "@prisma/client";
-import { error } from "console";
 import dayjs from "dayjs";
 
 export async function createExpense(body: CreateExpenseBodySchema) {
@@ -26,6 +25,30 @@ export async function createExpense(body: CreateExpenseBodySchema) {
   try {
     await db.$transaction(async (prisma) => {
       const expenseTags = [];
+      const wallet = await prisma.wallet.findUnique({
+        where: {
+          id: walletId,
+        },
+      });
+      if (!wallet) {
+        throw new Error("Wallet is not found.");
+      }
+      let newBalance = wallet.balance;
+      if (type === "i") {
+        newBalance += +total;
+      } else {
+        newBalance -= +total;
+      }
+
+      await prisma.wallet.update({
+        where: {
+          id: walletId,
+        },
+        data: {
+          balance: newBalance,
+        },
+      });
+
       for (let i = 0; i < expenseTag.length; i++) {
         const tag = expenseTag[i];
         const existTag = await prisma.tag.findFirst({
@@ -116,6 +139,30 @@ export async function updateExpenseById(
         userId,
         type,
       } = validatedFields.data;
+
+      const wallet = await prisma.wallet.findUnique({
+        where: {
+          id: walletId,
+        },
+      });
+      if (!wallet) {
+        throw new Error("Wallet is not found.");
+      }
+
+      const difference = existExpense.total - +total;
+      const newBalance =
+        type === "e"
+          ? wallet.balance + difference
+          : wallet.balance - difference;
+
+      await prisma.wallet.update({
+        where: {
+          id: walletId,
+        },
+        data: {
+          balance: newBalance,
+        },
+      });
 
       const expenseTags = [];
       for (let i = 0; i < expenseTag.length; i++) {

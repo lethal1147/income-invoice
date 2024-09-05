@@ -16,6 +16,7 @@ import {
 import NavDialogForm from "./navDialogForm";
 import useWalletStore from "@/stores/walletStore";
 import { useSession } from "next-auth/react";
+import { formatCurrencyThaiBath } from "@/utils/formatter";
 
 export default function NavMenu() {
   const location = usePathname();
@@ -49,7 +50,9 @@ export default function NavMenu() {
             ))}
           </SelectContent>
         </Select>
-        {}
+        <p className="text-sm my-1">
+          <b>Balance</b> : {formatCurrencyThaiBath(wallet?.balance || 0) || "-"}
+        </p>
       </div>
 
       <Link

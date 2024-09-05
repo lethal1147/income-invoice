@@ -6,6 +6,7 @@ import {
   WalletSchemaType,
   WalletSchemaTypeWithId,
 } from "@/schema/wallet";
+import { formatErrorMessage } from "@/utils/formatter";
 
 export async function createWallet(body: WalletSchemaType) {
   const validatedFields = walletSchema.safeParse(body);
@@ -41,4 +42,22 @@ export async function getWalletListByUserId(userId: string) {
     },
   });
   return { error: false, data: walletList };
+}
+
+export async function getOneWalletByWalletId(walletId: string) {
+  try {
+    if (!walletId) {
+      throw new Error("WalletId is required.");
+    }
+
+    const wallet = await db.wallet.findUnique({
+      where: {
+        id: walletId,
+      },
+    });
+
+    return { error: false, wallet };
+  } catch (err) {
+    return { error: true, message: formatErrorMessage(err) };
+  }
 }
