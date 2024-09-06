@@ -1,8 +1,28 @@
-import { Cell, Legend, Pie, PieChart, PieLabel, Tooltip } from "recharts";
+import {
+  Cell,
+  LabelList,
+  Legend,
+  Pie,
+  PieChart,
+  PieLabel,
+  Tooltip,
+} from "recharts";
 import { COLORS, RADIAN } from "../constant";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { chartConfig } from "@/configs/chartConfig";
 
 type SpendingPieChartPropsType = {
   data: { [key: string]: number };
+};
+
+type Transaction = {
+  name: string;
+  value: number;
+  percentage: string;
 };
 
 const customDonutLabel: PieLabel = (props) => {
@@ -31,6 +51,11 @@ const customDonutLabel: PieLabel = (props) => {
     </text>
   );
 };
+
+function generateColor(index: number): string {
+  const hue = (index * 137.5) % 360;
+  return `hsl(${hue}, 70%, 50%)`;
+}
 
 const prepareDataForChart = (data: { [key: string]: number }) => {
   const totalSpending = Object.values(data).reduce(
@@ -61,23 +86,51 @@ const prepareDataForChart = (data: { [key: string]: number }) => {
   return chartData;
 };
 
+function transformData(transactions: Transaction[]) {
+  const config: Record<string, { label: string; color: string }> = {};
+  const chartData = transactions.map((transaction, index) => {
+    const color = generateColor(index);
+    config[transaction.name] = {
+      label: transaction.name,
+      color: color,
+    };
+    return {
+      ...transaction,
+      fill: color,
+    };
+  });
+
+  return { config, chartData };
+}
+
 export default function SpendingPieChart({ data }: SpendingPieChartPropsType) {
-  const chartData = prepareDataForChart(data);
+  const preparedData = prepareDataForChart(data);
+  const { config, chartData } = transformData(preparedData);
   return (
-    <PieChart width={550} height={500}>
-      <Pie
-        data={chartData}
-        dataKey="value"
-        nameKey="name"
-        label={customDonutLabel}
-        labelLine={false}
-      >
-        {chartData.map((entry, index) => (
-          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-        ))}
-      </Pie>
-      <Tooltip formatter={(value: number) => `$${value}`} />
-      <Legend />
-    </PieChart>
+    <ChartContainer className="mx-auto size-full" config={config}>
+      <PieChart>
+        <Pie
+          data={chartData}
+          dataKey="value"
+          nameKey="name"
+          cy="50%"
+          cx="50%"
+          outerRadius={250}
+          label={customDonutLabel}
+          labelLine={false}
+        >
+          <LabelList
+            dataKey="value"
+            className="fill-background "
+            stroke="black"
+            fontSize={20}
+            formatter={(value: keyof typeof chartConfig) =>
+              chartConfig[value]?.label
+            }
+          />
+        </Pie>
+        <ChartTooltip content={<ChartTooltipContent />} />
+      </PieChart>
+    </ChartContainer>
   );
 }

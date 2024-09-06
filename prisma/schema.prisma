@@ -27,6 +27,7 @@ model User {
   expenses Expense[]
   tags Tag[]
   wallet Wallet[]
+  partyBill PartyBill[]
 }
 
 model Wallet {
@@ -76,4 +77,40 @@ model ExpenseTag {
   expenseId String
   tag Tag @relation(fields: [tagId], references: [id])
   tagId String
+}
+
+model PartyBill {
+  id String @id @default(uuid())
+  date DateTime
+  name String
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  billMenus BillMenus[]
+  billMembers BillMembers[]
+
+  @@index([userId])
+}
+
+model BillMenus {
+  id String @id @default(uuid())
+  name String
+  quantity Int
+  pricePerItem Int
+  partyBill PartyBill @relation(fields: [partyBillId], references: [id], onDelete: Cascade)
+  partyBillId String
+}
+
+model BillMembers {
+  id String @id @default(uuid())
+  name String
+  partyBill PartyBill @relation(fields: [partyBillId], references: [id], onDelete: Cascade)
+  partyBillId String
+  memberMenus MemberMenus[]
+}
+
+model MemberMenus {
+  id String @id @default(uuid())
+  quantity Int
+  BillMembers BillMembers @relation(fields: [billMembersId], references: [id], onDelete: Cascade)
+  billMembersId String
 }

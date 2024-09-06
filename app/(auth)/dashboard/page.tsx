@@ -2,6 +2,8 @@
 
 import NavMenu from "@/components/sidebar/navMenu";
 import {
+  ChevronLeft,
+  ChevronRight,
   CircleDollarSign,
   Clock,
   HandCoins,
@@ -62,6 +64,7 @@ export default function Dashboard() {
     totalExpense: 0,
     totalSave: 0,
   });
+  const [year, setYear] = useState(2024);
   const { data: session } = useSession();
   const { wallet } = useWalletStore();
 
@@ -70,7 +73,7 @@ export default function Dashboard() {
       if (!session?.user?.id) return;
       try {
         setStatus(apiStatus.PENDING);
-        const response = await getExpenseSummary(session?.user?.id);
+        const response = await getExpenseSummary(session?.user?.id, year);
         if (response.error) throw new Error("Error on get expense summary");
         setExpenseSummaryData(response.data);
         setStatus(apiStatus.SUCCESS);
@@ -79,7 +82,7 @@ export default function Dashboard() {
       }
     };
     fetchExpenseData();
-  }, [session?.user?.id]);
+  }, [session?.user?.id, year]);
 
   useEffect(() => {
     const fetchExpenseSummaryOfTag = async () => {
@@ -225,7 +228,24 @@ export default function Dashboard() {
           >
             <ResizablePanel defaultSize={50}>
               <div className="flex flex-col h-full">
-                <h2 className="text-xl font-bold p-5">Overview this year</h2>
+                <span className="flex w-full justify-between items-center">
+                  <h2 className="text-xl font-bold p-5">Overview this year</h2>
+                  <div className="flex gap-3">
+                    <div
+                      className="hover:bg-gray-200 rounded-full cursor-pointer"
+                      onClick={() => setYear((prev) => prev - 1)}
+                    >
+                      <ChevronLeft />
+                    </div>
+                    <p>{year}</p>
+                    <div
+                      className="hover:bg-gray-200 rounded-full cursor-pointer"
+                      onClick={() => setYear((prev) => prev + 1)}
+                    >
+                      <ChevronRight />
+                    </div>
+                  </div>
+                </span>
                 {isPending ? (
                   <div className="size-full flex justify-center items-center">
                     <Loader />

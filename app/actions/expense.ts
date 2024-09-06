@@ -310,7 +310,10 @@ export async function deleteExpenseByExpenseId(expenseId: string) {
   }
 }
 
-export async function getExpenseSummary(userId: string): Promise<{
+export async function getExpenseSummary(
+  userId: string,
+  year: number
+): Promise<{
   error: boolean;
   data: ExpenseSummaryDataType[];
   message?: string;
@@ -320,11 +323,13 @@ export async function getExpenseSummary(userId: string): Promise<{
 
     for (let month = 0; month < 12; month++) {
       const startDate = dayjs()
+        .year(year)
         .month(month)
         .startOf("month")
         .add(7, "hour")
         .toDate();
       const endDate = dayjs()
+        .year(year)
         .month(month)
         .endOf("month")
         .add(7, "hour")
