@@ -141,7 +141,7 @@ export default function Page() {
   };
 
   return (
-    <div className="flex text-gray-800">
+    <main className="flex text-gray-800">
       <NavMenu />
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <div className="p-10 gap-10 flex flex-col w-full loginBackGround">
@@ -190,7 +190,7 @@ export default function Page() {
                 }
                 options={EXPENSE_TYPE_DROPDOWNS}
                 placeholder="Type"
-                styles={customStyles}
+                styles={customStyles()}
               />
             </div>
             <Button
@@ -326,6 +326,6 @@ export default function Page() {
         title="Are you sure?"
         description=" This action cannot be undone. This will permanently delete your transaction."
       />
-    </div>
+    </main>
   );
 }

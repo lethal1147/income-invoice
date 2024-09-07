@@ -112,7 +112,7 @@ export default function CreateRecordForm({
             <FormField
               name="walletId"
               control={form.control}
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <FormItem>
                   <FormLabel>Wallet</FormLabel>
                   <FormControl>
@@ -124,7 +124,7 @@ export default function CreateRecordForm({
                       onChange={(val: OptionType) => field.onChange(val.value)}
                       options={walletDropdown}
                       placeholder="Wallet"
-                      styles={customStyles}
+                      styles={customStyles(error)}
                     />
                   </FormControl>
                 </FormItem>
@@ -149,7 +149,7 @@ export default function CreateRecordForm({
             <FormField
               name="type"
               control={form.control}
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <FormItem>
                   <FormLabel>Type</FormLabel>
                   <FormControl>
@@ -161,7 +161,7 @@ export default function CreateRecordForm({
                       onChange={(val: OptionType) => field.onChange(val.value)}
                       options={EXPENSE_TYPE_DROPDOWNS}
                       placeholder="Type"
-                      styles={customStyles}
+                      styles={customStyles(error)}
                     />
                   </FormControl>
                 </FormItem>
@@ -172,7 +172,7 @@ export default function CreateRecordForm({
             <FormField
               name="expenseTag"
               control={form.control}
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <FormItem>
                   <FormLabel>Tags</FormLabel>
                   <FormControl>
@@ -184,7 +184,7 @@ export default function CreateRecordForm({
                       }
                       options={tagsDropdown}
                       placeholder="Tags"
-                      styles={customStyles}
+                      styles={customStyles(error)}
                       isMulti
                       isClearable
                     />

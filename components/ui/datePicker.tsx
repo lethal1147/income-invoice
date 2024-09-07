@@ -14,7 +14,6 @@ import {
 import { CalendarIcon } from "lucide-react";
 
 export function DatePicker({ ...props }) {
-
   return (
     <Popover>
       <PopoverTrigger className="w-full" asChild>
@@ -22,7 +21,8 @@ export function DatePicker({ ...props }) {
           variant={"outline"}
           className={cn(
             "w-full justify-start hover:bg-transparent text-left font-normal focus:ring-1 ring---",
-            !props.value && "text-muted-foreground"
+            !props.value && "text-muted-foreground",
+            props["aria-invalid"] && "border-red-500"
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />

@@ -17,6 +17,7 @@ import NavDialogForm from "./navDialogForm";
 import useWalletStore from "@/stores/walletStore";
 import { useSession } from "next-auth/react";
 import { formatCurrencyThaiBath } from "@/utils/formatter";
+import BlinkingTag from "../common/blinkingTag";
 
 export default function NavMenu() {
   const location = usePathname();
@@ -78,6 +79,18 @@ export default function NavMenu() {
         href={"/expense"}
       >
         Transactions
+      </Link>
+      <Link
+        className={cn(
+          "px-5 py-3 rounded-md transition hover:bg-gray-300 w-full",
+          {
+            "bg-green-main text-white hover:bg-green-main":
+              location.startsWith("/partyPay"),
+          }
+        )}
+        href={"/partyPay"}
+      >
+        Party Pay <BlinkingTag text="New" />
       </Link>
 
       <form className="mt-auto px-0 mx-auto " action={signOutAction}>

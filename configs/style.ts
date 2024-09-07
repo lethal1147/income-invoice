@@ -5,16 +5,16 @@ interface Option {
   value: string;
 }
 
-export const customStyles: StylesConfig<Option, false> = {
+export const customStyles: StylesConfig<Option, false> = (errors: boolean) => ({
   control: (provided, state) => ({
     ...provided,
     backgroundColor: "#ffffff", // var(--background)
-    borderColor: "#e5e7eb", // var(--input)
+    borderColor: errors ? "#ef4444" : "#e5e7eb", // var(--input)
     borderRadius: "0.5rem", // var(--radius)
     padding: "0.25rem",
     boxShadow: state.isFocused ? "0 0 0 2px #16A34A" : "none", // var(--ring)
     "&:hover": {
-      borderColor: "#e5e7eb", // var(--input)
+      borderColor: errors ? "#ef4444" : "#e5e7eb", // var(--input)
     },
   }),
   menu: (provided) => ({
@@ -43,13 +43,13 @@ export const customStyles: StylesConfig<Option, false> = {
     ...provided,
     color: "#0f172a", // var(--foreground)
   }),
-};
+});
 
 export const customStylesNoBorder: StylesConfig<Option, false> = {
   control: (provided, state) => ({
     ...provided,
     border: "none",
-    textDecoration: 'underline',
+    textDecoration: "underline",
     backgroundColor: "transparent", // var(--background)
     borderColor: "#e5e7eb", // var(--input)
     borderRadius: "0.5rem", // var(--radius)

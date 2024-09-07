@@ -137,7 +137,7 @@ export default function Dashboard() {
     <main className="flex">
       <NavMenu />
       <section className="loginBackGround p-10 gap-10 flex flex-col w-full">
-        <div className="bg-white border p-8 rounded-md gap-10 flex flex-col size-full">
+        <div className="bg-white border p-8 rounded-md gap-10 flex flex-col size-full shadow-lg">
           <div className="flex justify-between ">
             <div className="flex justify-between h-24 w-full">
               <div className="flex gap-5">
@@ -167,7 +167,7 @@ export default function Dashboard() {
                 <div className=" row-span-1 bg-gray-200 flex self-start gap-1 rounded-xl h-auto p-1">
                   <div
                     className={cn("current-state-filter", {
-                      "bg-gray-500 text-white": currentFilter === "month",
+                      "bg-green-main text-white": currentFilter === "month",
                     })}
                     onClick={() => onChangeFilter("month")}
                     role="button"
@@ -176,7 +176,7 @@ export default function Dashboard() {
                   </div>
                   <div
                     className={cn("current-state-filter", {
-                      "bg-gray-500 text-white": currentFilter === "quarter",
+                      "bg-green-main text-white": currentFilter === "quarter",
                     })}
                     onClick={() => onChangeFilter("quarter")}
                     role="button"
@@ -185,7 +185,7 @@ export default function Dashboard() {
                   </div>
                   <div
                     className={cn("current-state-filter", {
-                      "bg-gray-500 text-white ": currentFilter === "year",
+                      "bg-green-main text-white ": currentFilter === "year",
                     })}
                     onClick={() => onChangeFilter("year")}
                     role="button"
@@ -194,7 +194,7 @@ export default function Dashboard() {
                   </div>
                   <div
                     className={cn("current-state-filter", {
-                      "bg-gray-500 text-white": currentFilter === "custom",
+                      "bg-green-main text-white": currentFilter === "custom",
                     })}
                     onClick={() => setCurrentFilter("custom")}
                     role="button"
