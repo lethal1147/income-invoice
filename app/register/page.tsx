@@ -16,7 +16,6 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { register } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/router";
 import Link from "next/link";
 
 export default function Register() {

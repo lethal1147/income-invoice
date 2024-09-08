@@ -41,19 +41,18 @@ import Select from "react-select";
 import { THAILAND_BANKS_OPTIONS } from "@/constant/dropdown";
 import { customStyles } from "@/configs/style";
 import { OptionType } from "@/types/utilsType";
+import ImageUploader from "@/components/common/imageUploader";
+import useImageUploader from "@/hooks/useImageUploader";
+import { createPartyPayBill } from "@/app/actions/partyPay";
 
 export default function CreateBillModal() {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const form = useForm<CreateBillSchemaType>({
     resolver: zodResolver(createBillSchema),
-    defaultValues: {
-      userId: session?.user?.id,
-      billMenus: [],
-      member: [],
-      vatFlag: false,
-      serviceChargeFlag: false,
-    },
+  });
+  const { previewImage, setImage, clearImage } = useImageUploader({
+    setValue: (file) => form.setValue("qrcode", file),
   });
   const paymentMethod = form.watch("paymentMethod");
   const billMenus = useFieldArray({
@@ -66,7 +65,15 @@ export default function CreateBillModal() {
     name: "member",
   });
   const onSubmit = async (data: CreateBillSchemaType) => {
-    console.log(data);
+    try {
+      const formData = new FormData();
+      formData.append("body", JSON.stringify(data));
+      formData.append("qrcode", data.qrcode as File);
+      const result = await createPartyPayBill(formData);
+      console.log(result);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleTabChange = (val: PaymentMethodType) => {
@@ -81,6 +88,7 @@ export default function CreateBillModal() {
     }
     if (val !== "qrcode") {
       form.setValue("qrcode", "");
+      clearImage();
     }
   };
 
@@ -88,11 +96,15 @@ export default function CreateBillModal() {
     if (!session?.user?.id) return;
     const resetForm: Partial<CreateBillSchemaType> = {
       userId: session.user.id,
+      billMenus: [],
+      member: [],
+      vatFlag: false,
+      serviceChargeFlag: false,
+      paymentMethod: "bank",
     };
 
     form.reset(resetForm);
   }, [session?.user?.id]);
-
   return (
     <Dialog onOpenChange={setIsOpen} open={isOpen}>
       <DialogTrigger asChild>
@@ -138,7 +150,7 @@ export default function CreateBillModal() {
                     className={cn("", {
                       "text-red-500":
                         form.formState.errors.billMenus &&
-                        form.watch("billMenus").length <= 0,
+                        billMenus.fields?.length <= 0,
                     })}
                   >
                     Menus
@@ -219,7 +231,7 @@ export default function CreateBillModal() {
                     className={cn("", {
                       "text-red-500":
                         form.formState.errors.member &&
-                        form.watch("member").length <= 0,
+                        members.fields.length <= 0,
                     })}
                   >
                     Members
@@ -260,7 +272,7 @@ export default function CreateBillModal() {
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
-              <div className="flex gap-8 items-end">
+              <div className="flex gap-8 items-end border-b pb-5">
                 <FormField
                   control={form.control}
                   name="vatFlag"
@@ -292,8 +304,9 @@ export default function CreateBillModal() {
                   )}
                 />
               </div>
+              <h3 className="font-bold">Payment</h3>
               <Tabs
-                className="bg-gray-100 rounded-t-lg"
+                className="bg-gray-100 rounded-lg p-3"
                 value={paymentMethod}
                 onValueChange={(val) =>
                   handleTabChange(val as PaymentMethodType)
@@ -305,7 +318,7 @@ export default function CreateBillModal() {
                   <TabsTrigger value="qrcode">QR Code</TabsTrigger>
                 </TabsList>
                 <TabsContent
-                  className="bg-gray-100 p-2 flex flex-col gap-3 rounded-b-lg"
+                  className="bg-gray-100 flex flex-col gap-3"
                   value="bank"
                 >
                   <FormField
@@ -338,7 +351,56 @@ export default function CreateBillModal() {
                       <FormItem>
                         <FormLabel>Account Number</FormLabel>
                         <FormControl>
-                          <Input {...field} type="text" />
+                          <Input
+                            {...field}
+                            type="text"
+                            placeholder="000-0-00000-0"
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </TabsContent>
+                <TabsContent
+                  className="bg-gray-100 flex flex-col gap-3"
+                  value="promptpay"
+                >
+                  <FormField
+                    control={form.control}
+                    name="promptpay"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Promtpay</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="text"
+                            placeholder="000-000-0000"
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </TabsContent>
+                <TabsContent
+                  className="bg-gray-100 flex flex-col gap-3"
+                  value="qrcode"
+                >
+                  <FormField
+                    control={form.control}
+                    name="qrcode"
+                    render={({ field, fieldState: { error } }) => (
+                      <FormItem>
+                        <FormLabel>Qrcode</FormLabel>
+                        <FormControl>
+                          <ImageUploader
+                            field={field}
+                            error={error}
+                            image={previewImage}
+                            onChangeImage={setImage}
+                            text="Only accept JPG, PNG size less than 5MB"
+                            title="Click or Drag and drop to upload QR Code"
+                          />
                         </FormControl>
                       </FormItem>
                     )}

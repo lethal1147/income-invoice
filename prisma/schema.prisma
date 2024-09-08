@@ -18,6 +18,11 @@ enum ExpenseType {
   i
 }
 
+enum PaymentMethod {
+  bank
+  promptpay
+  qrcode
+}
 model User {
   id String @id @default(uuid())
   name String
@@ -87,10 +92,16 @@ model PartyBill {
   userId String
   vatFlag Boolean
   serviceChargeFlag Boolean
+  paymentMethod PaymentMethod
+  bank String
+  bankNumber String
+  promptpay String
+  qrcode String
   billMenus BillMenus[]
   billMembers BillMembers[]
 
   @@index([userId])
+  @@index([date])
 }
 
 model BillMenus {

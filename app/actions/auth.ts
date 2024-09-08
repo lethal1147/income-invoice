@@ -10,6 +10,7 @@ import { loginBodySchema, LoginBodySchemaType } from "@/schema/login";
 import { signIn, signOut } from "@/auth";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { AuthError } from "next-auth";
+import { uploadToCloudinary } from "@/services/cloudinary";
 
 export async function login(data: LoginBodySchemaType) {
   const validatedFields = loginBodySchema.safeParse(data);
@@ -52,24 +53,9 @@ export async function register(data: FormData) {
     const fileImage = data.get("image") as File;
     let fileUploadUrl = "";
     if (fileImage) {
-      const arrayBuffer = await fileImage?.arrayBuffer();
-      const buffer = new Uint8Array(arrayBuffer);
-      const response: UploadApiResponse | undefined = await new Promise(
-        (resolve, reject) => {
-          cloudinary.uploader
-            .upload_stream({}, function (err, result) {
-              if (err) {
-                reject(err);
-                return;
-              }
-              resolve(result);
-            })
-            .end(buffer);
-        }
-      );
-      if (response) {
-        fileUploadUrl = response.url;
-      }
+      const response = await uploadToCloudinary(fileImage);
+      if (response.error) throw new Error("Error on upload to cloudinary.");
+      fileUploadUrl = response.url;
     }
 
     const existingUser = await getUserByEmail(email);
