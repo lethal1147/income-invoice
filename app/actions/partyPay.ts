@@ -5,21 +5,22 @@ import { createBillSchema, PaymentMethodType } from "@/schema/partyBill";
 import { uploadToCloudinary } from "@/services/cloudinary";
 import { formatErrorMessage } from "@/utils/formatter";
 import { PaymentMethod } from "@prisma/client";
+import dayjs from "dayjs";
 
 export async function createPartyPayBill(formData: FormData) {
   const bodyJson = formData.get("body") as string;
   if (!bodyJson) {
-    console.log("this one");
     return { error: true, message: "Invalid body." };
   }
   const body = JSON.parse(bodyJson);
 
   const validatedFields = createBillSchema.safeParse({
     ...body,
-    date: new Date(body.date),
-    qrcode: body.qrcode?.path || null,
+    date: dayjs(body.date).add(7, "hour").toDate(),
+    qrcode: body.qrcode?.path || "",
   });
   if (!validatedFields.success) {
+    console.log(validatedFields.error);
     return {
       error: true,
       message: "Invalid body.",
@@ -39,7 +40,6 @@ export async function createPartyPayBill(formData: FormData) {
     bankNumber,
     promptpay,
   } = validatedFields.data;
-  console.log("paymentMethod", paymentMethod as PaymentMethod);
   try {
     let qrcode = "";
     if (paymentMethod === "qrcode") {
@@ -96,6 +96,71 @@ export async function createPartyPayBill(formData: FormData) {
     });
 
     return { error: false, message: "Create new party pay successfully." };
+  } catch (err) {
+    console.log(err);
+    return { error: true, message: formatErrorMessage(err) };
+  }
+}
+
+export async function getPartyPayBillByUserId(userId: string) {
+  if (!userId) {
+    return { error: true, message: "User id is required." };
+  }
+  try {
+    const partyBills = await prisma?.partyBill.findMany({
+      include: {
+        billMembers: {
+          include: { memberMenus: true },
+        },
+        billMenus: true,
+      },
+      where: {
+        userId,
+      },
+    });
+
+    return { error: false, data: partyBills };
+  } catch (err) {
+    return { error: true, message: formatErrorMessage(err) };
+  }
+}
+
+export async function getPartyPayBillByBillId(billId: string) {
+  if (!billId) {
+    return { error: true, message: "User id is required." };
+  }
+  try {
+    const partyBill = await prisma?.partyBill.findUnique({
+      include: {
+        billMembers: {
+          include: { memberMenus: true },
+        },
+        billMenus: true,
+      },
+      where: {
+        id: billId,
+      },
+    });
+
+    return { error: false, data: partyBill };
+  } catch (err) {
+    return { error: true, message: formatErrorMessage(err) };
+  }
+}
+
+export async function getMenusByBillId(billId: string) {
+  try {
+    if (!billId) {
+      return { error: true, message: "User id is required." };
+    }
+
+    const result = await db.billMenus.findMany({
+      where: {
+        partyBillId: billId,
+      },
+    });
+
+    return { error: false, data: result };
   } catch (err) {
     console.log(err);
     return { error: true, message: formatErrorMessage(err) };

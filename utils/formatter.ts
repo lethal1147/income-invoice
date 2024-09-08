@@ -1,3 +1,4 @@
+import { OptionType } from "@/types/utilsType";
 import dayjs from "dayjs";
 
 export function formatErrorMessage(err: unknown): string {
@@ -28,4 +29,15 @@ export function formatCurrencyThaiBath(number: string | number) {
     currency: "THB",
   });
   return currentFormat.format(+number);
+}
+
+export function formatOptionDropdown<T>(
+  arr: T[],
+  keyLabel: keyof T,
+  keyValue: keyof T
+): OptionType[] {
+  return arr.map((opt) => ({
+    value: opt[keyValue] as string | number,
+    label: opt[keyLabel] as string,
+  }));
 }

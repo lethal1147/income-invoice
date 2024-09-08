@@ -22,18 +22,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import CreateBillModal from "./createBillModal";
+import { PartyBillCalendar } from "@/types/partyBillType";
+import Link from "next/link";
 
-interface TasksData {
-  [date: string]: string[];
-}
-
-const tasks: TasksData = {
-  "2024-05-15": ["Complete project proposal", "Team meeting at 2 PM"],
-  "2024-05-20": ["Dentist appointment", "Submit expense report"],
-  "2024-06-01": ["Start new project", "Call with client"],
+type CalendarPagePropsType = {
+  data: PartyBillCalendar;
 };
 
-export default function CalendarPage() {
+export default function CalendarPage({ data }: CalendarPagePropsType) {
   const [date, setDate] = useState<Date>(new Date());
 
   const monthStart = startOfMonth(date);
@@ -91,7 +87,7 @@ export default function CalendarPage() {
                   !isSameMonth(day, date) && "text-muted-foreground",
                   isSameDay(day, new Date()) &&
                     "bg-accent text-accent-foreground",
-                  tasks[format(day, "yyyy-MM-dd")] &&
+                  data[format(day, "yyyy-MM-dd")] &&
                     "font-bold !text-green-main bg-green-main/10"
                 )}
               >
@@ -102,14 +98,16 @@ export default function CalendarPage() {
               <DialogHeader>
                 <DialogTitle>{format(day, "MMMM d, yyyy")}</DialogTitle>
                 <DialogDescription>
-                  {tasks[format(day, "yyyy-MM-dd")] ? (
+                  {data[format(day, "yyyy-MM-dd")] ? (
                     <ul className="list-disc list-inside">
-                      {tasks[format(day, "yyyy-MM-dd")].map((task, index) => (
-                        <li key={index}>{task}</li>
+                      {data[format(day, "yyyy-MM-dd")].map((task) => (
+                        <li key={task.id}>
+                          <Link href={`/bill/${task.id}`}>{task.name}</Link>
+                        </li>
                       ))}
                     </ul>
                   ) : (
-                    "No tasks for this day."
+                    "No bills for this day."
                   )}
                 </DialogDescription>
               </DialogHeader>

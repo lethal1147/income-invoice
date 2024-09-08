@@ -3,7 +3,7 @@
  * These routes do not require authentication
  */
 
-export const publicRoutes = ["/", "/register"];
+export const publicRoutes = ["/", "/register", "bill/[id]"];
 
 /**
  * An array of routes that are used for authentication

@@ -23,6 +23,11 @@ enum PaymentMethod {
   promptpay
   qrcode
 }
+
+enum MemberPaymentStatus {
+  paid
+  idle
+}
 model User {
   id String @id @default(uuid())
   name String
@@ -111,11 +116,13 @@ model BillMenus {
   pricePerItem Int
   partyBill PartyBill @relation(fields: [partyBillId], references: [id], onDelete: Cascade)
   partyBillId String
+  memberMenus MemberMenus[]
 }
 
 model BillMembers {
   id String @id @default(uuid())
   name String
+  status MemberPaymentStatus @default(idle)
   partyBill PartyBill @relation(fields: [partyBillId], references: [id], onDelete: Cascade)
   partyBillId String
   memberMenus MemberMenus[]
@@ -124,6 +131,8 @@ model BillMembers {
 model MemberMenus {
   id String @id @default(uuid())
   quantity Int
-  BillMembers BillMembers @relation(fields: [billMembersId], references: [id], onDelete: Cascade)
+  billMenu BillMenus @relation(fields: [billMenuId], references: [id], onDelete: Cascade)
+  billMenuId String
+  billMembers BillMembers @relation(fields: [billMembersId], references: [id], onDelete: Cascade)
   billMembersId String
 }

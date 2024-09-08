@@ -1,4 +1,3 @@
-import { expenseTag } from "./../schema/expense";
 import { FilterQuery } from "./utilsType";
 import { TagType } from "./tagsType";
 import { Expense, ExpenseTag, Prisma, User, Wallet } from "@prisma/client";
