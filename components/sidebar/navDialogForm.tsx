@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,8 +18,12 @@ import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { createWallet } from "@/app/actions/wallet";
 import { useSession } from "next-auth/react";
+import useStatus from "@/hooks/useStatus";
+import { apiStatus } from "@/constant/status";
+import LoaderOverLay from "../common/loaderOverlay";
 
 export default function NavDialogForm() {
+  const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
   const form = useForm<WalletSchemaType>({
     defaultValues: {
@@ -27,6 +31,7 @@ export default function NavDialogForm() {
     },
     resolver: zodResolver(walletSchema),
   });
+  const { isPending, setStatus } = useStatus(apiStatus.IDLE);
 
   useEffect(() => {
     form.reset({
@@ -35,12 +40,22 @@ export default function NavDialogForm() {
   }, [session?.user?.id]);
 
   const onSubmitHandler = async (data: WalletSchemaType) => {
-    const res = await createWallet(data);
-    console.log(res)
+    try {
+      setStatus(apiStatus.PENDING);
+      const res = await createWallet(data);
+      if (res.error)
+        throw new Error((res.message as string) || "Error on create wallet.");
+      setStatus(apiStatus.SUCCESS);
+      setIsOpen(false);
+    } catch (err) {
+      console.log(err);
+      setStatus(apiStatus.ERROR);
+    }
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {isPending && <LoaderOverLay />}
       <DialogTrigger asChild>
         <Button variant="link">Create New Wallet</Button>
       </DialogTrigger>

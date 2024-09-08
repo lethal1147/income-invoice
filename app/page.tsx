@@ -16,18 +16,26 @@ import "./globals.css";
 import { login } from "./actions/auth";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import useStatus from "@/hooks/useStatus";
+import { apiStatus } from "@/constant/status";
+import Loader from "@/components/common/loader";
+import LoaderOverLay from "@/components/common/loaderOverlay";
 
 export default function Home() {
   const form = useForm<LoginBodySchemaType>({
     resolver: zodResolver(loginBodySchema),
   });
+  const { isPending, setStatus } = useStatus(apiStatus.IDLE);
 
   const onSubmit = form.handleSubmit(async (data) => {
+    setStatus(apiStatus.PENDING);
     await login(data);
+    setStatus(apiStatus.SUCCESS);
   });
 
   return (
     <main className=" h-screen w-screen flex justify-center items-center loginBackGround text-gray-800">
+      {isPending && <LoaderOverLay />}
       <Form {...form}>
         <form
           onSubmit={onSubmit}

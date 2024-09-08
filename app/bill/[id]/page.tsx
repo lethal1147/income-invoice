@@ -7,7 +7,7 @@ import MemberCard from "./components/memberCard";
 import useMemberBillStore from "@/stores/memberBillStore";
 import useStatus from "@/hooks/useStatus";
 import { apiStatus } from "@/constant/status";
-import Loader from "@/components/common/loader";
+import LoaderOverLay from "@/components/common/loaderOverlay";
 
 export default function Page({ params }: { params: { id: string } }) {
   const { getPartyPayBillByBillId, billInfo } = useMemberBillStore();
@@ -19,11 +19,7 @@ export default function Page({ params }: { params: { id: string } }) {
   }, [params.id]);
   return (
     <div className="h-screen p-10 w-screen loginBackGround flex justify-center items-center">
-      {isPending && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <Loader />
-        </div>
-      )}
+      {isPending && <LoaderOverLay />}
       <div className="w-full h-full bg-white border shadow-lg p-5 rounded-md flex gap-10">
         <div className=" w-[400px] bg-gray-200 rounded-md"></div>
         <div className="w-full">

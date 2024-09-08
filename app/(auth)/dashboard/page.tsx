@@ -67,7 +67,7 @@ export default function Dashboard() {
   const [year, setYear] = useState(2024);
   const { data: session } = useSession();
   const { wallet } = useWalletStore();
-
+  console.log(wallet);
   useEffect(() => {
     const fetchExpenseData = async () => {
       if (!session?.user?.id) return;

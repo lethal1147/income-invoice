@@ -407,7 +407,6 @@ export async function getSummaryTags(
     GROUP BY t."name"
     ORDER BY totalAmount DESC
   `;
-
     const totalIncome = await prisma.expense.aggregate({
       where: {
         type: "i",
@@ -415,6 +414,7 @@ export async function getSummaryTags(
           gte: startDate,
           lte: endDate,
         },
+        userId,
       },
       _sum: {
         total: true,
@@ -427,6 +427,7 @@ export async function getSummaryTags(
           gte: startDate,
           lte: endDate,
         },
+        userId,
       },
       _sum: {
         total: true,

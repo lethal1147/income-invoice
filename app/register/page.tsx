@@ -17,16 +17,21 @@ import { useForm } from "react-hook-form";
 import { register } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import useStatus from "@/hooks/useStatus";
+import { apiStatus } from "@/constant/status";
+import LoaderOverLay from "@/components/common/loaderOverlay";
 
 export default function Register() {
   const form = useForm<RegisterSchemaType>({
     resolver: zodResolver(registerSchema),
   });
+  const { isPending, setStatus } = useStatus(apiStatus.IDLE);
 
   const image = form.watch("image");
 
   const action = form.handleSubmit(async (data: RegisterSchemaType) => {
     try {
+      setStatus(apiStatus.PENDING);
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("password", data.password);
@@ -34,13 +39,16 @@ export default function Register() {
       formData.append("email", data.email);
       const res = await register(formData);
       if (res.error) throw new Error(res.message);
+      setStatus(apiStatus.SUCCESS);
     } catch (err) {
       console.log(err);
+      setStatus(apiStatus.ERROR);
     }
   });
 
   return (
     <main className="h-screen w-screen flex justify-center items-center loginBackGround text-gray-800">
+      {isPending && <LoaderOverLay />}
       <Form {...form}>
         <form
           onSubmit={action}
