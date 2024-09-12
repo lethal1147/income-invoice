@@ -39,7 +39,7 @@ export default function MemberCard({ member, billId }: MemberCardPropsType) {
           </CardContent>
         </Card>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="min-w-[800px]">
         <DialogHeader>
           <DialogTitle>{member.name}</DialogTitle>
           <DialogDescription>total : 10000</DialogDescription>

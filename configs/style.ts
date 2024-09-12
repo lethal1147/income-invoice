@@ -43,6 +43,10 @@ export const customStyles: StylesConfig<Option, false> = (errors: boolean) => ({
     ...provided,
     color: "#0f172a", // var(--foreground)
   }),
+  menuPortal: (base) => ({
+    ...base,
+    zIndex: 9999,
+  }),
 });
 
 export const customStylesNoBorder: StylesConfig<Option, false> = {
@@ -84,5 +88,9 @@ export const customStylesNoBorder: StylesConfig<Option, false> = {
   input: (provided) => ({
     ...provided,
     color: "#0f172a", // var(--foreground)
+  }),
+  menuPortal: (base) => ({
+    ...base,
+    zIndex: 9999,
   }),
 };

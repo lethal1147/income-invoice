@@ -12,9 +12,12 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { customStyles } from "@/configs/style";
 import { cn } from "@/lib/utils";
 import { memberBillSchema, MemberBillSchemaType } from "@/schema/memberBill";
 import useMemberBillStore from "@/stores/memberBillStore";
+import { OptionType } from "@/types/utilsType";
 import { formatCurrencyThaiBath } from "@/utils/formatter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, X } from "lucide-react";
@@ -36,8 +39,12 @@ export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
     name: "menus",
     rules: { minLength: 1 },
   });
-  const { menusDropdown, getMenusByBillId } = useMemberBillStore();
-  console.log(menusDropdown);
+  const {
+    menusDropdown,
+    getMenusByBillId,
+    menus: menuList,
+  } = useMemberBillStore();
+
   const onSubmit = async (data: MemberBillSchemaType) => {
     console.log(data);
   };
@@ -74,21 +81,54 @@ export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
             </AccordionTrigger>
             <AccordionContent className="flex flex-col px-5">
               {menus.fields.map((menu, index) => {
-                const total = +form.watch(`menus.${index}.quantity`);
-
+                const menuId = form.watch(`menus.${index}.menuId`);
+                const menuData = menuList.find((mn) => mn.id === menuId);
+                const quantity = +form.watch(`menus.${index}.quantity`);
+                const total = quantity * (menuData?.pricePerItem || 0);
+                console.log(menuData);
                 return (
                   <div
                     key={menu.menuId + index}
                     className="flex justify-between gap-5 py-2 border-b"
                   >
+                    <div className="w-3/5">
+                      <FormField
+                        control={form.control}
+                        name={`menus.${index}.menuId`}
+                        render={({ field, fieldState: { error } }) => (
+                          <FormItem>
+                            <FormLabel>Menu name</FormLabel>
+                            <FormControl>
+                              <Select
+                                menuPortalTarget={document.body}
+                                {...field}
+                                onChange={(val: OptionType) =>
+                                  field.onChange(val.value)
+                                }
+                                value={menusDropdown.find(
+                                  (opt) => opt.value === field.value
+                                )}
+                                options={menusDropdown}
+                                styles={customStyles(error)}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
                     <FormField
                       control={form.control}
-                      name={`menus.${index}.menuId`}
+                      name={`menus.${index}.quantity`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Menu name</FormLabel>
+                          <FormLabel>Quantity</FormLabel>
                           <FormControl>
-                            <Select {...field} options={menusDropdown} />
+                            <Input
+                              max={menuData?.quantity}
+                              type="number"
+                              {...field}
+                            />
                           </FormControl>
                         </FormItem>
                       )}
@@ -107,13 +147,15 @@ export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
                 );
               })}
 
-              <Button
-                onClick={() => menus.append({ menuId: "", quantity: "1" })}
-                className="size-8 p-1 rounded-full self-center my-3"
-                type="button"
-              >
-                <Plus className="font-bold" size={100} />
-              </Button>
+              {menus.fields.length < menuList.length && (
+                <Button
+                  onClick={() => menus.append({ menuId: "", quantity: "1" })}
+                  className="size-8 p-1 rounded-full self-center my-3"
+                  type="button"
+                >
+                  <Plus className="font-bold" size={100} />
+                </Button>
+              )}
             </AccordionContent>
           </AccordionItem>
         </Accordion>
