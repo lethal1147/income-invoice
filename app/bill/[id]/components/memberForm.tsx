@@ -21,9 +21,17 @@ import { OptionType } from "@/types/utilsType";
 import { formatCurrencyThaiBath } from "@/utils/formatter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, X } from "lucide-react";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import Select from "react-select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type MemberFormPropsType = {
   memberId: string;
@@ -43,14 +51,28 @@ export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
     menusDropdown,
     getMenusByBillId,
     menus: menuList,
+    billInfo,
   } = useMemberBillStore();
+
+  const selectedMenu = form.watch("menus")?.map((mn) => mn.menuId);
+
+  const total = menus.fields.reduce((acc, cur) => {
+    const menuInfo = menuList.find((mn) => mn.id === cur.menuId);
+    if (menuInfo) {
+      return acc + menuInfo.pricePerItem * +cur.quantity;
+    }
+
+    return acc;
+  }, 0);
+  const vat = 0;
+  const serviceCharge = 0;
 
   const onSubmit = async (data: MemberBillSchemaType) => {
     console.log(data);
   };
 
   useEffect(() => {
-    if (!memberId) return;
+    if (!memberId || !billId) return;
     const resetForm: Partial<MemberBillSchemaType> = {
       menus: [],
       memberId,
@@ -79,13 +101,12 @@ export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
             >
               Menus
             </AccordionTrigger>
-            <AccordionContent className="flex flex-col px-5">
+            <AccordionContent className="flex flex-col px-5 ">
               {menus.fields.map((menu, index) => {
                 const menuId = form.watch(`menus.${index}.menuId`);
                 const menuData = menuList.find((mn) => mn.id === menuId);
                 const quantity = +form.watch(`menus.${index}.quantity`);
                 const total = quantity * (menuData?.pricePerItem || 0);
-                console.log(menuData);
                 return (
                   <div
                     key={menu.menuId + index}
@@ -98,58 +119,85 @@ export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
                         render={({ field, fieldState: { error } }) => (
                           <FormItem>
                             <FormLabel>Menu name</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Menu's name" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent
+                                className={cn("z-[9999]", {
+                                  "border-red-500": error,
+                                })}
+                              >
+                                {menusDropdown
+                                  .filter(
+                                    (dropdown) =>
+                                      !selectedMenu.includes(
+                                        dropdown.value.toString()
+                                      ) || dropdown.value === field.value
+                                  )
+                                  .map((menu) => (
+                                    <SelectItem
+                                      key={menu.value}
+                                      value={menu.value as string}
+                                    >
+                                      {menu.label}
+                                    </SelectItem>
+                                  ))}
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="w-1/5">
+                      <FormField
+                        control={form.control}
+                        name={`menus.${index}.quantity`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Quantity</FormLabel>
                             <FormControl>
-                              <Select
-                                menuPortalTarget={document.body}
+                              <Input
+                                max={menuData?.quantity}
+                                type="number"
                                 {...field}
-                                onChange={(val: OptionType) =>
-                                  field.onChange(val.value)
-                                }
-                                value={menusDropdown.find(
-                                  (opt) => opt.value === field.value
-                                )}
-                                options={menusDropdown}
-                                styles={customStyles(error)}
+                                min={1}
                               />
                             </FormControl>
                           </FormItem>
                         )}
                       />
                     </div>
-
-                    <FormField
-                      control={form.control}
-                      name={`menus.${index}.quantity`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Quantity</FormLabel>
-                          <FormControl>
-                            <Input
-                              max={menuData?.quantity}
-                              type="number"
-                              {...field}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    <p className="self-end py-3 min-w-16 text-end">
-                      {formatCurrencyThaiBath(total || 0)}
-                    </p>
-                    <Button
-                      onClick={() => menus.remove(index)}
-                      type="button"
-                      className="bg-red-500 hover:bg-red-500/80 p-0.5 my-2 size-6 self-end"
-                    >
-                      <X />
-                    </Button>
+                    <div className="flex justify-end gap-5 w-1/5">
+                      <p className="self-end py-3 min-w-16 text-end">
+                        {formatCurrencyThaiBath(total || 0)}
+                      </p>
+                      <Button
+                        onClick={() => menus.remove(index)}
+                        type="button"
+                        className="bg-red-500 hover:bg-red-500/80 p-0.5 my-2 size-6 self-end"
+                      >
+                        <X />
+                      </Button>
+                    </div>
                   </div>
                 );
               })}
 
               {menus.fields.length < menuList.length && (
                 <Button
-                  onClick={() => menus.append({ menuId: "", quantity: "1" })}
+                  onClick={() =>
+                    menus.append({
+                      menuId: "",
+                      quantity: "1",
+                    })
+                  }
                   className="size-8 p-1 rounded-full self-center my-3"
                   type="button"
                 >
@@ -159,6 +207,13 @@ export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+        <div className="w-1/2 self-end grid grid-cols-2 justify-end text-end">
+          <p>Vat(7%)</p>
+          <p>{formatCurrencyThaiBath(billInfo?.vatFlag ? total : 0)}</p>
+          <p>Service charge(10%)</p>
+          <p>{}</p>
+          <p>Total </p>
+        </div>
       </form>
     </Form>
   );

@@ -18,7 +18,6 @@ export default function Page({ params }: { params: { id: string } }) {
   const { getPartyPayBillByBillId, billInfo, summaryData } =
     useMemberBillStore();
   const { isPending, setStatus } = useStatus(apiStatus.PENDING);
-  console.log(billInfo);
 
   useEffect(() => {
     if (!params.id) return;

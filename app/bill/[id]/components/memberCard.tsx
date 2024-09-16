@@ -39,12 +39,13 @@ export default function MemberCard({ member, billId }: MemberCardPropsType) {
           </CardContent>
         </Card>
       </DialogTrigger>
-      <DialogContent className="min-w-[800px]">
+
+      <DialogContent className="min-w-[800px] z-50">
         <DialogHeader>
           <DialogTitle>{member.name}</DialogTitle>
           <DialogDescription>total : 10000</DialogDescription>
-          <MemberForm billId={billId} memberId={member.id} />
         </DialogHeader>
+        <MemberForm billId={billId} memberId={member.id} />
       </DialogContent>
     </Dialog>
   );

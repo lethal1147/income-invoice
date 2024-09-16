@@ -64,9 +64,9 @@ const prepareDataForChart = (data: { [key: string]: number }) => {
   );
   const sortedEntries = Object.entries(data).sort((a, b) => b[1] - a[1]);
 
-  const top5 = sortedEntries.slice(0, 4);
+  const top5 = sortedEntries.slice(0, 5);
   const others = sortedEntries
-    .slice(5)
+    .slice(6)
     .reduce((acc, [, value]) => acc + value, 0);
 
   const chartData = top5.map(([name, value]) => ({

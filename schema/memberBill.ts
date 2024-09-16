@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const memberMenusSchema = z.object({
+  id: z.string().optional(),
   menuId: z.string(),
   quantity: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
     message: "Expected number, received a string",

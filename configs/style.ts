@@ -16,12 +16,14 @@ export const customStyles: StylesConfig<Option, false> = (errors: boolean) => ({
     "&:hover": {
       borderColor: errors ? "#ef4444" : "#e5e7eb", // var(--input)
     },
+    zIndex: 9999,
   }),
   menu: (provided) => ({
     ...provided,
     backgroundColor: "#ffffff", // var(--popover)
     color: "#1f2937", // var(--popover-foreground)
     borderRadius: "0.5rem", // var(--radius)
+    zIndex: 9999,
   }),
   option: (provided, state) => ({
     ...provided,
@@ -30,6 +32,7 @@ export const customStyles: StylesConfig<Option, false> = (errors: boolean) => ({
     "&:hover": {
       backgroundColor: "#f3f4f6", // var(--muted)
     },
+    zIndex: 9999,
   }),
   singleValue: (provided) => ({
     ...provided,
