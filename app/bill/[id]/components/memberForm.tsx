@@ -21,7 +21,7 @@ import { OptionType } from "@/types/utilsType";
 import { formatCurrencyThaiBath } from "@/utils/formatter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, X } from "lucide-react";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import {
   Select,
@@ -41,6 +41,9 @@ type MemberFormPropsType = {
 export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
   const form = useForm<MemberBillSchemaType>({
     resolver: zodResolver(memberBillSchema),
+    defaultValues: {
+      menus: [],
+    },
   });
   const menus = useFieldArray({
     control: form.control,
@@ -53,22 +56,30 @@ export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
     menus: menuList,
     billInfo,
   } = useMemberBillStore();
-
   const selectedMenu = form.watch("menus")?.map((mn) => mn.menuId);
-
-  const total = menus.fields.reduce((acc, cur) => {
+  const menusForm = form.watch("menus");
+  const newTotal = menusForm.reduce((acc, cur) => {
     const menuInfo = menuList.find((mn) => mn.id === cur.menuId);
     if (menuInfo) {
       return acc + menuInfo.pricePerItem * +cur.quantity;
     }
-
     return acc;
   }, 0);
-  const vat = 0;
-  const serviceCharge = 0;
+
+  const vat = billInfo?.vatFlag ? (newTotal * 7) / 100 : 0;
+  const serviceCharge = billInfo?.serviceChargeFlag ? (newTotal * 10) / 100 : 0;
+  const net = newTotal + serviceCharge + vat;
 
   const onSubmit = async (data: MemberBillSchemaType) => {
-    console.log(data);
+    try {
+      const cleanData = {
+        ...data,
+        menus: data.menus.filter((menu) => menu.menuId),
+      };
+      console.log(cleanData);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   useEffect(() => {
@@ -209,10 +220,18 @@ export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
         </Accordion>
         <div className="w-1/2 self-end grid grid-cols-2 justify-end text-end">
           <p>Vat(7%)</p>
-          <p>{formatCurrencyThaiBath(billInfo?.vatFlag ? total : 0)}</p>
+          <p>{formatCurrencyThaiBath(vat)}</p>
           <p>Service charge(10%)</p>
-          <p>{}</p>
-          <p>Total </p>
+          <p>{formatCurrencyThaiBath(serviceCharge)}</p>
+          <p>Total</p>
+          <p>{formatCurrencyThaiBath(net)}</p>
+        </div>
+
+        <div className="flex justify-end gap-5">
+          <Button type="button" variant="outline">
+            Cancel
+          </Button>
+          <Button type="submit">Save</Button>
         </div>
       </form>
     </Form>

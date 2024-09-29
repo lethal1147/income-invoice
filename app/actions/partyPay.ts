@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { MemberBillSchemaType } from "@/schema/memberBill";
 import { createBillSchema, PaymentMethodType } from "@/schema/partyBill";
 import { uploadToCloudinary } from "@/services/cloudinary";
 import { formatErrorMessage } from "@/utils/formatter";
@@ -163,6 +164,16 @@ export async function getMenusByBillId(billId: string) {
     return { error: false, data: result };
   } catch (err) {
     console.log(err);
+    return { error: true, message: formatErrorMessage(err) };
+  }
+}
+
+export async function updateMemberMenu(
+  billId: string,
+  body: MemberBillSchemaType
+) {
+  try {
+  } catch (err) {
     return { error: true, message: formatErrorMessage(err) };
   }
 }

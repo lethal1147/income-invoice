@@ -157,16 +157,17 @@ export default function Page() {
               />
             </div>
             <div className="grow flex flex-col">
-              <Label htmlFor="name">Date</Label>
+              <Label htmlFor="date">Date</Label>
               <div className="grow">
                 <DatePickerWithRange
+                  id="date"
                   value={filterDate}
                   onSelect={setFilterDate}
                 />
               </div>
             </div>
             <div className="grow">
-              <Label htmlFor="name">Tags</Label>
+              <Label htmlFor="tags">Tags</Label>
               <Input
                 onChange={(e) =>
                   setFilterQuery((prev) => ({ ...prev, tags: e.target.value }))
@@ -177,7 +178,7 @@ export default function Page() {
               />
             </div>
             <div className="grow">
-              <Label htmlFor="name">Type</Label>
+              <Label htmlFor="type">Type</Label>
               <Select
                 value={EXPENSE_TYPE_DROPDOWNS.find(
                   (opt) => opt.value === filterQuery.type
