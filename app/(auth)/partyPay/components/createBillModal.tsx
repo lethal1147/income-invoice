@@ -68,7 +68,7 @@ export default function CreateBillModal() {
         <Button>+ Add new bill</Button>
       </DialogTrigger>
       <DialogContent className="min-w-[800px]">
-        <ScrollArea className="max-h-[700px] px-5">
+        <ScrollArea className="max-h-[600px] px-5">
           <DialogHeader className="font-bold text-xl pb-5">
             <DialogTitle>Create party bill</DialogTitle>
           </DialogHeader>

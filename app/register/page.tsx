@@ -41,7 +41,7 @@ export default function Register() {
       if (res.error) throw new Error(res.message);
       setStatus(apiStatus.SUCCESS);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setStatus(apiStatus.ERROR);
     }
   });

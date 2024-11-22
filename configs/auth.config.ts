@@ -14,8 +14,7 @@ const authConfig: NextAuthConfig = {
           const { email, password } = validatedField.data;
 
           const user = await getUserByEmail(email);
-          console.log(user)
-          
+
           if (!user || !user.password) return null;
 
           const isPasswordMatch = await bcrypt.compare(password, user.password);

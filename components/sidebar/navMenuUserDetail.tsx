@@ -20,7 +20,7 @@ export default function NavMenuUserDetail() {
           <Image src={defaultUserImage} alt="user default image" />
         </AvatarFallback>
       </Avatar>
-      <p className="text-lg my-3">{session?.user?.name}</p>
+      <p className="text-lg my-3 text-center">{session?.user?.name}</p>
     </>
   );
 }
