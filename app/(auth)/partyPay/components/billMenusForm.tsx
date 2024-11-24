@@ -17,17 +17,11 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { CreateBillSchemaType } from "@/schema/partyBill";
 import { formatCurrencyThaiBath } from "@/utils/formatter";
-import { Camera, Plus, X } from "lucide-react";
-import React, { ChangeEvent, useState } from "react";
+import { Plus, X } from "lucide-react";
+import React from "react";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
 import { DEFAULT_BILL_MENU_OBJ } from "../constant";
-import { Dialog } from "@radix-ui/react-dialog";
-import {
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import UploadBill from "./uploadBill";
 
 type BillMenusFormPropsType = {
   form: UseFormReturn<CreateBillSchemaType>;
@@ -39,13 +33,6 @@ export default function BillMenusForm({ form }: BillMenusFormPropsType) {
     name: "billMenus",
     rules: { minLength: 1 },
   });
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-
-  const onSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadedFile(file);
-  };
 
   return (
     <Accordion type="single" collapsible className="w-full">
@@ -127,29 +114,7 @@ export default function BillMenusForm({ form }: BillMenusFormPropsType) {
               <Plus className="font-bold" size={100} />
             </Button>
             <div className="w-full h-[1px] bg-gray-300 my-2" />
-            <Dialog>
-              <DialogTrigger>
-                <Button
-                  variant="secondary"
-                  className="size-8 p-1 rounded-full self-center mb-2 text-green-main"
-                  type="button"
-                >
-                  <Camera className="font-bold" size={80} />
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogTitle>Upload your bill</DialogTitle>
-                <DialogDescription>
-                  For automatic generate bill menus.
-                </DialogDescription>
-                <Input
-                  onChange={onSelectFile}
-                  accept="image/png, image/jpeg"
-                  type="file"
-                />
-                <Button size="sm">Generate</Button>
-              </DialogContent>
-            </Dialog>
+            <UploadBill form={form} />
           </div>
         </AccordionContent>
       </AccordionItem>

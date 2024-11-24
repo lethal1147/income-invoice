@@ -62,6 +62,7 @@ export default function CreateBillModal() {
 
     form.reset(resetForm);
   }, [session?.user?.id]);
+
   return (
     <Dialog onOpenChange={setIsOpen} open={isOpen}>
       <DialogTrigger asChild>

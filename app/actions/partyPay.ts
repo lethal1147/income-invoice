@@ -1,9 +1,11 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { MemberBillSchemaType } from "@/schema/memberBill";
-import { createBillSchema, PaymentMethodType } from "@/schema/partyBill";
+import { memberBillSchema, MemberBillSchemaType } from "@/schema/memberBill";
+import { createBillSchema } from "@/schema/partyBill";
 import { uploadToCloudinary } from "@/services/cloudinary";
+import { readMenuFromReceiptImage } from "@/services/formRecognizer";
+import { submitMessageToGPT } from "@/services/openai";
 import { formatErrorMessage } from "@/utils/formatter";
 import { PaymentMethod } from "@prisma/client";
 import dayjs from "dayjs";
@@ -168,12 +170,41 @@ export async function getMenusByBillId(billId: string) {
   }
 }
 
-export async function updateMemberMenu(
-  billId: string,
-  body: MemberBillSchemaType
-) {
+export async function updateMemberMenu(body: MemberBillSchemaType) {
+  const validatedData = memberBillSchema.safeParse(body);
+  if (!validatedData.success) {
+    return { error: true, message: "Invalid body." };
+  }
   try {
+    // const memberMenu = await prisma?.memberMenus.create({
+    // data: {},
+    // });
   } catch (err) {
+    return { error: true, message: formatErrorMessage(err) };
+  }
+}
+
+export async function generateBillMenusByBillImage(body: FormData) {
+  try {
+    const image = body.get("image") as File;
+    if (!image) throw new Error("Image is missing.");
+    const { content } = await readMenuFromReceiptImage(image);
+    const messageResponse = await submitMessageToGPT(content);
+
+    if (messageResponse) {
+      const messageObject = JSON.parse(messageResponse);
+      if (messageObject.error) {
+        throw new Error(messageObject.message);
+      }
+
+      return {
+        error: false,
+        message: "Generate bill menus successfully.",
+        menus: messageObject.menus,
+      };
+    }
+  } catch (err) {
+    console.log(err);
     return { error: true, message: formatErrorMessage(err) };
   }
 }
