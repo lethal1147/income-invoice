@@ -70,6 +70,7 @@ model ExpenseTag {
 
 model PartyBill {
   id                String        @id @default(uuid())
+  billPublicId String @unique
   date              DateTime
   name              String
   userId            String
@@ -86,6 +87,7 @@ model PartyBill {
 
   @@index([userId])
   @@index([date])
+  @@index([billPublicId])
 }
 
 model BillMenus {

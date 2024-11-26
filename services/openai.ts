@@ -10,7 +10,6 @@ export const submitMessageToGPT = async (message: string) => {
     });
     const apiKey = process.env.OPENAI_API_KEY;
     const openai = new OpenAI({ apiKey });
-    console.log(payloadTemplate);
     const gptResponseMessage = await openai.chat.completions.create(
       payloadTemplate as OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming
     );

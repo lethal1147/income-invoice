@@ -20,22 +20,31 @@ import useStatus from "@/hooks/useStatus";
 import { apiStatus } from "@/constant/status";
 import Loader from "@/components/common/loader";
 import LoaderOverLay from "@/components/common/loaderOverlay";
+import ErrorCard from "@/components/common/errorCard";
 
 export default function Home() {
   const form = useForm<LoginBodySchemaType>({
     resolver: zodResolver(loginBodySchema),
   });
-  const { isPending, setStatus } = useStatus(apiStatus.IDLE);
+  const { isPending, isError, setStatus } = useStatus(apiStatus.IDLE);
 
   const onSubmit = form.handleSubmit(async (data) => {
     setStatus(apiStatus.PENDING);
-    await login(data);
-    setStatus(apiStatus.SUCCESS);
+    const response = await login(data);
+    if (response.error) {
+      setStatus(apiStatus.ERROR);
+    } else {
+      setStatus(apiStatus.SUCCESS);
+    }
   });
+
+  const onCloseError = () => {
+    setStatus(apiStatus.IDLE);
+  };
 
   return (
     <main className=" h-screen w-screen flex justify-center items-center loginBackGround text-gray-800">
-      {isPending && <LoaderOverLay />}
+      {/* {isPending && <LoaderOverLay />} */}
       <Form {...form}>
         <form
           onSubmit={onSubmit}
@@ -66,10 +75,18 @@ export default function Home() {
               </FormItem>
             )}
           />
-          <Button className="self-end px-0 underline" variant="link">
+          <Button disabled className="self-end px-0 underline" variant="link">
             Forget your password
           </Button>
-          <Button>Login</Button>
+          {isError && (
+            <ErrorCard
+              errorText="Incorrect email or password."
+              onClose={onCloseError}
+            />
+          )}
+          <Button disabled={isPending}>
+            {isPending ? "Loging in..." : "Login"}
+          </Button>
           <div className="relative flex items-center my-2">
             <div className="h-0.5 w-full bg-gray-200" />
             <span className="text-gray-200 bg-white absolute left-1/2 transform -translate-x-1/2 px-1">
@@ -77,6 +94,7 @@ export default function Home() {
             </span>
           </div>
           <Button
+            disabled={isPending}
             type="button"
             onClick={() => signIn("google")}
             variant="outline"
@@ -84,6 +102,7 @@ export default function Home() {
             Login with Google
           </Button>
           <Button
+            disabled={isPending}
             type="button"
             onClick={() => signIn("github")}
             variant="outline"

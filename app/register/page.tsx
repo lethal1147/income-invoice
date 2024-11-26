@@ -20,12 +20,14 @@ import Link from "next/link";
 import useStatus from "@/hooks/useStatus";
 import { apiStatus } from "@/constant/status";
 import LoaderOverLay from "@/components/common/loaderOverlay";
+import { useRouter } from "next/navigation";
 
 export default function Register() {
   const form = useForm<RegisterSchemaType>({
     resolver: zodResolver(registerSchema),
   });
   const { isPending, setStatus } = useStatus(apiStatus.IDLE);
+  const router = useRouter();
 
   const image = form.watch("image");
 
@@ -40,8 +42,8 @@ export default function Register() {
       const res = await register(formData);
       if (res.error) throw new Error(res.message);
       setStatus(apiStatus.SUCCESS);
+      router.push("/");
     } catch (err) {
-      console.error(err);
       setStatus(apiStatus.ERROR);
     }
   });
@@ -146,7 +148,10 @@ export default function Register() {
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+
+          <Button className="mt-5" type="submit">
+            Submit
+          </Button>
         </form>
       </Form>
     </main>

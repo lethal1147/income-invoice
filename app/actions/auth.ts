@@ -31,10 +31,11 @@ export async function login(data: LoginBodySchemaType) {
       message: `Welcome, ${data.email}!`,
     };
   } catch (err) {
-    console.log(err);
     if (err instanceof AuthError) {
       switch (err.type) {
         case "CredentialsSignin":
+          return { error: true, message: "Invalid credentials!" };
+        case "CallbackRouteError":
           return { error: true, message: "Invalid credentials!" };
         default:
           return { error: true, message: "Something went wrong!" };
