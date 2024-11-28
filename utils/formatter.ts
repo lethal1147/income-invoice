@@ -41,3 +41,13 @@ export function formatOptionDropdown<T>(
     label: opt[keyLabel] as string,
   }));
 }
+
+export function generatePublicId(date: Date) {
+  const formattedDate = dayjs(date).format("YYMMDD");
+
+  const randomCode = Array.from({ length: 6 }, () =>
+    Math.random().toString(36).charAt(2).toUpperCase()
+  ).join("");
+
+  return `${formattedDate}-${randomCode}`;
+}

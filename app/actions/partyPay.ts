@@ -6,8 +6,8 @@ import { createBillSchema } from "@/schema/partyBill";
 import { uploadToCloudinary } from "@/services/cloudinary";
 import { readMenuFromReceiptImage } from "@/services/formRecognizer";
 import { submitMessageToGPT } from "@/services/openai";
-import { formatErrorMessage } from "@/utils/formatter";
-import { PaymentMethod } from "@prisma/client";
+import { formatErrorMessage, generatePublicId } from "@/utils/formatter";
+import { PartyBill, PaymentMethod } from "@prisma/client";
 import dayjs from "dayjs";
 
 export async function createPartyPayBill(formData: FormData) {
@@ -59,6 +59,18 @@ export async function createPartyPayBill(formData: FormData) {
 
       qrcode = cloudinaryRes.url;
     }
+
+    let generatedPublicId: string;
+    let existedPublicId: PartyBill | null | undefined;
+    do {
+      generatedPublicId = generatePublicId(date);
+      existedPublicId = await prisma?.partyBill.findUnique({
+        where: {
+          billPublicId: generatedPublicId,
+        },
+      });
+    } while (!!existedPublicId);
+
     await db.$transaction(async (prisma) => {
       const partyPay = await prisma.partyBill.create({
         data: {
@@ -72,6 +84,7 @@ export async function createPartyPayBill(formData: FormData) {
           bankNumber: bankNumber || "",
           promptpay: promptpay || "",
           qrcode,
+          billPublicId: generatedPublicId,
         },
       });
 

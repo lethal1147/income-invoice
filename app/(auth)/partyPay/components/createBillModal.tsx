@@ -29,6 +29,8 @@ import { createPartyPayBill } from "@/app/actions/partyPay";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import PaymentTab from "./paymentTab";
 import { Checkbox } from "@/components/ui/checkbox";
+import useStatus from "@/hooks/useStatus";
+import { apiStatus } from "@/constant/status";
 
 export default function CreateBillModal() {
   const { data: session } = useSession();
@@ -36,16 +38,22 @@ export default function CreateBillModal() {
   const form = useForm<CreateBillSchemaType>({
     resolver: zodResolver(createBillSchema),
   });
+  const { setStatus, isPending } = useStatus(apiStatus.IDLE);
 
   const onSubmit = async (data: CreateBillSchemaType) => {
     try {
+      setStatus(apiStatus.PENDING);
       const formData = new FormData();
       formData.append("body", JSON.stringify(data));
       formData.append("qrcode", data.qrcode as File);
       const result = await createPartyPayBill(formData);
+      if (result.error) {
+        throw new Error(result.message);
+      }
       console.log(result);
     } catch (err) {
       console.log(err);
+      setStatus(apiStatus.ERROR);
     }
   };
 
