@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 import { Button } from "../ui/button";
-import { signOutAction } from "@/app/actions/auth";
+import { signOutAction } from "@/app/actions/authen/";
 import NavMenuUserDetail from "./navMenuUserDetail";
 import {
   Select,

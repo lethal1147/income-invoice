@@ -16,7 +16,7 @@ import { walletSchema, WalletSchemaType } from "@/schema/wallet";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
-import { createWallet } from "@/app/actions/wallet";
+import { createWallet } from "@/app/actions/wallet/";
 import { useSession } from "next-auth/react";
 import useStatus from "@/hooks/useStatus";
 import { apiStatus } from "@/constant/status";

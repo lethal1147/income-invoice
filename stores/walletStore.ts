@@ -1,7 +1,7 @@
 import {
   getOneWalletByWalletId,
   getWalletListByUserId,
-} from "@/app/actions/wallet";
+} from "@/app/actions/wallet/";
 import { WalletSchemaTypeWithId } from "@/schema/wallet";
 import { OptionType } from "@/types/utilsType";
 import { create } from "zustand";

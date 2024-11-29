@@ -1,6 +1,6 @@
 "use client";
 
-import { generateBillMenusByBillImage } from "@/app/actions/partyPay";
+import { generateBillMenusByBillImage } from "@/app/actions/partyPay/";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

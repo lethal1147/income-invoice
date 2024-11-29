@@ -13,7 +13,7 @@ import { LoginBodySchemaType, loginBodySchema } from "@/schema/login";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import "./globals.css";
-import { login } from "./actions/auth";
+import { login } from "./actions/authen/";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import useStatus from "@/hooks/useStatus";
