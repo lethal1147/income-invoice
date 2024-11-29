@@ -84,7 +84,7 @@ export default function Home() {
               onClose={onCloseError}
             />
           )}
-          <Button disabled={isPending}>
+          <Button type="submit" disabled={isPending}>
             {isPending ? "Loging in..." : "Login"}
           </Button>
           <div className="relative flex items-center my-2">

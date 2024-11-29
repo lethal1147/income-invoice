@@ -25,12 +25,12 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import MemberForm from "./memberForm";
 import BillMenusForm from "./billMenusForm";
-import { createPartyPayBill } from "@/app/actions/partyPay";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import PaymentTab from "./paymentTab";
 import { Checkbox } from "@/components/ui/checkbox";
 import useStatus from "@/hooks/useStatus";
 import { apiStatus } from "@/constant/status";
+import { createPartyPayBill } from "@/app/actions/partyPay/";
 
 export default function CreateBillModal() {
   const { data: session } = useSession();
@@ -50,7 +50,8 @@ export default function CreateBillModal() {
       if (result.error) {
         throw new Error(result.message);
       }
-      console.log(result);
+      setStatus(apiStatus.SUCCESS);
+      setIsOpen(false);
     } catch (err) {
       console.log(err);
       setStatus(apiStatus.ERROR);
@@ -153,11 +154,12 @@ export default function CreateBillModal() {
                   onClick={() => setIsOpen(false)}
                   className="self-end"
                   variant="outline"
+                  disabled={isPending}
                 >
                   Cancel
                 </Button>
-                <Button type="submit" className="self-end">
-                  Create
+                <Button disabled={isPending} type="submit" className="self-end">
+                  {isPending ? "Pending..." : "Create"}
                 </Button>
               </div>
             </form>

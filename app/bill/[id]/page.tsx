@@ -12,7 +12,7 @@ import dayjs from "dayjs";
 import { formatCurrencyThaiBath } from "@/utils/formatter";
 import { THAILAND_BANKS } from "@/constant/dropdown";
 import Image from "next/image";
-import { CreditCard, SquareMenu } from "lucide-react";
+import { CreditCard, SquareMenu, Wrench } from "lucide-react";
 
 export default function Page({ params }: { params: { id: string } }) {
   const { getPartyPayBillByBillId, billInfo, summaryData } =
@@ -24,12 +24,19 @@ export default function Page({ params }: { params: { id: string } }) {
     getPartyPayBillByBillId(params.id);
     setStatus(apiStatus.SUCCESS);
   }, [params.id]);
+
   return (
     <div className="h-screen p-10 w-screen loginBackGround flex justify-center items-center">
       {isPending && <LoaderOverLay />}
       <div className="w-full h-full bg-white border shadow-lg p-5 rounded-md flex gap-10">
         <div className=" w-[600px] bg-gray-200 px-5 py-3 rounded-md flex flex-col gap-2">
-          <h1 className="font-bold text-2xl">{billInfo?.name}</h1>
+          <div className="flex justify-between items-center">
+            <h1 className="font-bold text-2xl">{billInfo?.name}</h1>
+            <Wrench
+              className="hover:text-green-main transition cursor-pointer"
+              size={25}
+            />
+          </div>
           <h2>{dayjs(billInfo?.date).format("DD MMMM YYYY")}</h2>
 
           <span className="flex gap-1 font-bold pt-5 text-xl">

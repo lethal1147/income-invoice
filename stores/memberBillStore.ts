@@ -1,7 +1,7 @@
 import {
   getMenusByBillId,
   getPartyPayBillByBillId,
-} from "@/app/actions/partyPay";
+} from "@/app/actions/partyPay/";
 import { PartyBillTypeWithInclude } from "@/types/partyBillType";
 import { OptionType } from "@/types/utilsType";
 import { sumTotalPartyPay } from "@/utils/calculator";
