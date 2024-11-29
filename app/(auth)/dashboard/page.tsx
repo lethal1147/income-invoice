@@ -32,7 +32,7 @@ import {
 import useStatus from "@/hooks/useStatus";
 import { apiStatus } from "@/constant/status";
 import { useSession } from "next-auth/react";
-import { getExpenseSummary, getSummaryTags } from "@/app/actions/expense";
+import { getExpenseSummary, getSummaryTags } from "@/app/actions/expense/";
 import { ExpenseSummaryDataType } from "@/types/expenseType";
 import Loader from "@/components/common/loader";
 import dayjs from "dayjs";

@@ -1,7 +1,7 @@
 import {
   deleteExpenseByExpenseId,
   getExpenseByUserId,
-} from "@/app/actions/expense";
+} from "@/app/actions/expense/";
 import { ExpenseQueryOption, ExpenseWithInclude } from "@/types/expenseType";
 import { create } from "zustand";
 

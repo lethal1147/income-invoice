@@ -1,4 +1,4 @@
-import { getPartyPayBillByUserId } from "@/app/actions/partyPay";
+import { getPartyPayBillByUserId } from "@/app/actions/partyPay/";
 import { PartyBillCalendar } from "@/types/partyBillType";
 import { create } from "zustand";
 
