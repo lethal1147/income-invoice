@@ -16,8 +16,8 @@ import { cn } from "@/lib/utils";
 import { CreateBillSchemaType } from "@/schema/partyBill";
 import React from "react";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
-import { DEFAULT_BILL_MEMBER_OBJ } from "../constant";
 import { Plus, X } from "lucide-react";
+import { DEFAULT_BILL_MEMBER_OBJ } from "@/app/(auth)/partyPay/constant";
 
 type MemberFormPropsType = {
   form: UseFormReturn<CreateBillSchemaType>;
@@ -41,7 +41,7 @@ export default function MemberForm({ form }: MemberFormPropsType) {
           Members
         </AccordionTrigger>
         <AccordionContent className="flex flex-col px-5">
-          {members.fields.map((member, index) => (
+          {members.fields.map((member, index: number) => (
             <div key={member.name + index} className="flex gap-5 py-2 border-b">
               <FormField
                 name={`member.${index}.name`}

@@ -1,7 +1,7 @@
 "use client";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import CopyButton from "./components/copyButton";
 import MemberCard from "./components/memberCard";
 import useMemberBillStore from "@/stores/memberBillStore";
@@ -13,8 +13,18 @@ import { formatCurrencyThaiBath } from "@/utils/formatter";
 import { THAILAND_BANKS } from "@/constant/dropdown";
 import Image from "next/image";
 import { CreditCard, SquareMenu, Wrench } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import PartyPayBillForm from "@/components/form/partyPay/partyPayBillForm";
 
 export default function Page({ params }: { params: { id: string } }) {
+  const [isOpen, setIsOpen] = useState(false);
   const { getPartyPayBillByBillId, billInfo, summaryData } =
     useMemberBillStore();
   const { isPending, setStatus } = useStatus(apiStatus.PENDING);
@@ -32,6 +42,18 @@ export default function Page({ params }: { params: { id: string } }) {
         <div className=" w-[600px] bg-gray-200 px-5 py-3 rounded-md flex flex-col gap-2">
           <div className="flex justify-between items-center">
             <h1 className="font-bold text-2xl">{billInfo?.name}</h1>
+            <Dialog>
+              <DialogTrigger></DialogTrigger>
+              <DialogContent className="min-w-[800px]">
+                <ScrollArea className="max-h-[600px] px-5">
+                  <DialogHeader className="font-bold text-xl pb-5">
+                    <DialogTitle>Create party bill</DialogTitle>
+                  </DialogHeader>
+                  <DialogDescription>Bill information</DialogDescription>
+                  <PartyPayBillForm setIsOpen={setIsOpen} />
+                </ScrollArea>
+              </DialogContent>
+            </Dialog>
             <Wrench
               className="hover:text-green-main transition cursor-pointer"
               size={25}

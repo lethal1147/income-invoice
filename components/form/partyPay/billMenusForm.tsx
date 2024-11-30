@@ -20,8 +20,8 @@ import { formatCurrencyThaiBath } from "@/utils/formatter";
 import { Plus, X } from "lucide-react";
 import React from "react";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
-import { DEFAULT_BILL_MENU_OBJ } from "../constant";
-import UploadBill from "./uploadBill";
+import { DEFAULT_BILL_MENU_OBJ } from "../../../app/(auth)/partyPay/constant";
+import UploadBill from "../../../app/(auth)/partyPay/components/uploadBill";
 
 type BillMenusFormPropsType = {
   form: UseFormReturn<CreateBillSchemaType>;
