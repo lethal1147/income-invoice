@@ -4,6 +4,7 @@ import "./globals.css";
 // import { getServerSession } from "next-auth";
 import SessionProvider from "@/components/sessionProvider";
 import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default async function RootLayout({
       <body className={inter.className}>
         <SessionProvider>{children}</SessionProvider>
         <Toaster />
+        <Sonner richColors />
       </body>
     </html>
   );

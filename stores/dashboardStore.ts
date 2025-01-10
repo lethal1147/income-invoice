@@ -1,6 +1,7 @@
 import { getExpenseSummary, getSummaryTags } from "@/app/actions/expense";
 import { ExpenseSummaryDataType } from "@/types/expenseType";
 import { CurrentFilterStateType } from "@/types/utilsType";
+import { handleError } from "@/utils/utils";
 import dayjs from "dayjs";
 import { create } from "zustand";
 
@@ -18,6 +19,12 @@ interface DashboardState {
     totalSave: number;
   };
   year: number;
+  fetchExpenseData: (userId: string) => Promise<void>;
+  fetchExpenseSummaryOfTag: (userId: string) => Promise<void>;
+  onChangeFilter: (type: CurrentFilterStateType) => void;
+  increaseYear: (mode: "increase" | "decrease") => void;
+  setCurrentFilter: (mode: CurrentFilterStateType) => void;
+  updateDateFilter: (range: { from: Date; to: Date }) => void;
 }
 
 const useDashboardStore = create<DashboardState>((set, get) => ({
@@ -41,7 +48,7 @@ const useDashboardStore = create<DashboardState>((set, get) => ({
       if (response.error) throw new Error("Error on get expense summary");
       set({ expenseSummaryData: response.data });
     } catch (err) {
-      console.log(err);
+      handleError(err);
     }
   },
   fetchExpenseSummaryOfTag: async (userId: string) => {
@@ -90,6 +97,16 @@ const useDashboardStore = create<DashboardState>((set, get) => ({
         break;
     }
     set({ currentFilter: type, dateFilter: newDateFilter });
+  },
+  increaseYear: (type: "decrease" | "increase") => {
+    const year = get().year;
+    set({ year: type === "increase" ? year + 1 : year - 1 });
+  },
+  setCurrentFilter: (mode: CurrentFilterStateType) => {
+    set({ currentFilter: mode });
+  },
+  updateDateFilter: (range: { from: Date; to: Date }) => {
+    set({ dateFilter: range });
   },
 }));
 

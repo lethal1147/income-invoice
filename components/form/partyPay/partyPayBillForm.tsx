@@ -24,6 +24,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
 import { useToast } from "@/components/ui/use-toast";
 import { useForm } from "react-hook-form";
+import { handleError } from "@/utils/utils";
 
 export default function PartyPayBillForm({
   setIsOpen,
@@ -56,7 +57,7 @@ export default function PartyPayBillForm({
       setStatus(apiStatus.SUCCESS);
       setIsOpen(false);
     } catch (err) {
-      console.log(err);
+      handleError(err);
       setStatus(apiStatus.ERROR);
     }
   };

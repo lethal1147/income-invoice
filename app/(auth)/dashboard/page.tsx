@@ -32,106 +32,68 @@ import {
 import useStatus from "@/hooks/useStatus";
 import { apiStatus } from "@/constant/status";
 import { useSession } from "next-auth/react";
-import { getExpenseSummary, getSummaryTags } from "@/app/actions/expense/";
-import { ExpenseSummaryDataType } from "@/types/expenseType";
 import Loader from "@/components/common/loader";
 import dayjs from "dayjs";
 import quarterOfYear from "dayjs/plugin/quarterOfYear";
 import { DatePickerWithRange } from "@/components/ui/datePickerRange";
 import useWalletStore from "@/stores/walletStore";
+import useDashboardStore from "@/stores/dashboardStore";
+import { handleError } from "@/utils/utils";
 
 dayjs.extend(quarterOfYear);
 
 export default function Dashboard() {
-  const [currentFilter, setCurrentFilter] =
-    useState<CurrentFilterStateType>("month");
-  const [dateFilter, setDateFilter] = useState({
-    from: dayjs().startOf("month").toDate(),
-    to: dayjs().endOf("month").toDate(),
-  });
+  const {
+    currentFilter,
+    dateFilter,
+    expenseSummaryData,
+    expenseTagSummary,
+    summary,
+    year,
+    fetchExpenseData,
+    fetchExpenseSummaryOfTag,
+    onChangeFilter,
+    increaseYear,
+    setCurrentFilter,
+    updateDateFilter,
+  } = useDashboardStore();
+
   const { isPending, setStatus } = useStatus(apiStatus.PENDING);
   const { isPending: isPendingTag, setStatus: setStatusTag } = useStatus(
     apiStatus.PENDING
   );
-  const [expenseSummaryData, setExpenseSummaryData] = useState<
-    ExpenseSummaryDataType[]
-  >([]);
-  const [expenseTagSummary, setExpenseTagSummary] = useState<{
-    [key: string]: number;
-  }>({});
-  const [summary, setSummary] = useState({
-    totalIncome: 0,
-    totalExpense: 0,
-    totalSave: 0,
-  });
-  const [year, setYear] = useState(2024);
   const { data: session } = useSession();
   const { wallet } = useWalletStore();
 
   useEffect(() => {
-    const fetchExpenseData = async () => {
+    const fetcher = async () => {
       if (!session?.user?.id) return;
       try {
         setStatus(apiStatus.PENDING);
-        const response = await getExpenseSummary(session?.user?.id, year);
-        if (response.error) throw new Error("Error on get expense summary");
-        setExpenseSummaryData(response.data);
+        await fetchExpenseData(session?.user?.id);
         setStatus(apiStatus.SUCCESS);
       } catch (err) {
+        handleError(err);
         setStatus(apiStatus.ERROR);
       }
     };
-    fetchExpenseData();
+    fetcher();
   }, [session?.user?.id, year]);
 
   useEffect(() => {
-    const fetchExpenseSummaryOfTag = async () => {
+    const fetcher = async () => {
       if (!session?.user?.id) return;
       try {
         setStatusTag(apiStatus.PENDING);
-        const response = await getSummaryTags(session.user.id, {
-          startDate: dateFilter.from,
-          endDate: dateFilter.to,
-        });
-
-        setExpenseTagSummary(response.data);
-        setSummary({
-          totalExpense: response.totalExpense,
-          totalIncome: response.totalIncome,
-          totalSave: response.totalIncome - response.totalExpense,
-        });
+        await fetchExpenseSummaryOfTag(session?.user?.id);
         setStatusTag(apiStatus.SUCCESS);
       } catch (err) {
+        handleError(err);
         setStatusTag(apiStatus.ERROR);
       }
     };
-    fetchExpenseSummaryOfTag();
+    fetcher();
   }, [session?.user?.id, dateFilter.from, dateFilter.to]);
-
-  const onChangeFilter = (type: CurrentFilterStateType) => {
-    switch (type) {
-      case "month":
-        setDateFilter({
-          from: dayjs().startOf("month").toDate(),
-          to: dayjs().endOf("month").toDate(),
-        });
-        break;
-      case "quarter":
-        setDateFilter({
-          from: dayjs().startOf("quarter").toDate(),
-          to: dayjs().endOf("quarter").toDate(),
-        });
-        break;
-      case "year":
-        setDateFilter({
-          from: dayjs().startOf("year").toDate(),
-          to: dayjs().endOf("year").toDate(),
-        });
-      default:
-        break;
-    }
-    setCurrentFilter(type);
-  };
 
   return (
     <main className="flex">
@@ -206,7 +168,9 @@ export default function Dashboard() {
                   {currentFilter === "custom" ? (
                     <DatePickerWithRange
                       value={dateFilter}
-                      onSelect={setDateFilter}
+                      onSelect={(range: { from: Date; to: Date }) =>
+                        updateDateFilter({ from: range?.from, to: range?.to })
+                      }
                     />
                   ) : (
                     <div className="flex items-end justify-end gap-2">
@@ -233,14 +197,14 @@ export default function Dashboard() {
                   <div className="flex gap-3">
                     <div
                       className="hover:bg-gray-200 rounded-full cursor-pointer"
-                      onClick={() => setYear((prev) => prev - 1)}
+                      onClick={() => increaseYear("decrease")}
                     >
                       <ChevronLeft />
                     </div>
                     <p>{year}</p>
                     <div
                       className="hover:bg-gray-200 rounded-full cursor-pointer"
-                      onClick={() => setYear((prev) => prev + 1)}
+                      onClick={() => increaseYear("increase")}
                     >
                       <ChevronRight />
                     </div>

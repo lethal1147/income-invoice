@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { handleError } from "@/utils/utils";
 import { Link } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
@@ -29,7 +30,7 @@ export default function CopyButton() {
       setText("Copied!");
       setCopying(true);
     } catch (err) {
-      console.log(err);
+      handleError(err);
     }
   };
 

@@ -21,6 +21,7 @@ import { useSession } from "next-auth/react";
 import useStatus from "@/hooks/useStatus";
 import { apiStatus } from "@/constant/status";
 import LoaderOverLay from "../common/loaderOverlay";
+import { handleError } from "@/utils/utils";
 
 export default function NavDialogForm() {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,7 +49,7 @@ export default function NavDialogForm() {
       setStatus(apiStatus.SUCCESS);
       setIsOpen(false);
     } catch (err) {
-      console.log(err);
+      handleError(err);
       setStatus(apiStatus.ERROR);
     }
   };

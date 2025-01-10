@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { apiStatus } from "@/constant/status";
 import useStatus from "@/hooks/useStatus";
 import { CreateBillSchemaType } from "@/schema/partyBill";
+import { handleError } from "@/utils/utils";
 import { Camera } from "lucide-react";
 import { ChangeEvent, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -47,7 +48,7 @@ export default function UploadBill({ form }: UploadBillPropsType) {
       form.setValue("billMenus", res?.menus || []);
       setFormOpen(false);
     } catch (err) {
-      console.log(err);
+      handleError(err);
       setStatus(apiStatus.ERROR);
     }
   };

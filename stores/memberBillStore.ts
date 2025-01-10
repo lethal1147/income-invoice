@@ -6,6 +6,7 @@ import { PartyBillTypeWithInclude } from "@/types/partyBillType";
 import { OptionType } from "@/types/utilsType";
 import { sumTotalPartyPay } from "@/utils/calculator";
 import { formatOptionDropdown } from "@/utils/formatter";
+import { handleError } from "@/utils/utils";
 import { BillMenus } from "@prisma/client";
 import { create } from "zustand";
 
@@ -42,7 +43,7 @@ const useMemberBillStore = create<MemberBillState>()((set) => ({
         summaryData: sumTotalPartyPay(formatted.billMenus),
       });
     } catch (err) {
-      console.log(err);
+      handleError(err);
     }
   },
   getMenusByBillId: async (billId: string) => {
@@ -55,7 +56,7 @@ const useMemberBillStore = create<MemberBillState>()((set) => ({
         menus: response.data,
       });
     } catch (err) {
-      console.log(err);
+      handleError(err);
     }
   },
 }));

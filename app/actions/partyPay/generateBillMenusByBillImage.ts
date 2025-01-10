@@ -1,8 +1,9 @@
-'use server'
+"use server";
 
 import { readMenuFromReceiptImage } from "@/services/formRecognizer";
 import { submitMessageToGPT } from "@/services/openai";
 import { formatErrorMessage } from "@/utils/formatter";
+import { handleError } from "@/utils/utils";
 
 export async function generateBillMenusByBillImage(body: FormData) {
   try {
@@ -24,7 +25,7 @@ export async function generateBillMenusByBillImage(body: FormData) {
       };
     }
   } catch (err) {
-    console.log(err);
+    handleError(err);
     return { error: true, message: formatErrorMessage(err) };
   }
 }

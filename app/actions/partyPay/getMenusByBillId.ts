@@ -1,7 +1,8 @@
-'use server'
+"use server";
 
 import { db } from "@/lib/db";
 import { formatErrorMessage } from "@/utils/formatter";
+import { handleError } from "@/utils/utils";
 
 export async function getMenusByBillId(billId: string) {
   try {
@@ -17,7 +18,7 @@ export async function getMenusByBillId(billId: string) {
 
     return { error: false, data: result };
   } catch (err) {
-    console.log(err);
+    handleError(err);
     return { error: true, message: formatErrorMessage(err) };
   }
 }

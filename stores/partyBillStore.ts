@@ -1,5 +1,6 @@
 import { getPartyPayBillByUserId } from "@/app/actions/partyPay/";
 import { PartyBillCalendar } from "@/types/partyBillType";
+import { handleError } from "@/utils/utils";
 import { create } from "zustand";
 
 const formatCalendarData = (
@@ -34,7 +35,7 @@ const usePartyBillStore = create<PartyBillState>()((set) => ({
         calendarPartyBill: calendarData,
       });
     } catch (err) {
-      console.log(err);
+      handleError(err);
     }
   },
 }));

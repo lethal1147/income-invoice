@@ -32,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { handleError } from "@/utils/utils";
 
 type MemberFormPropsType = {
   memberId: string;
@@ -78,7 +79,7 @@ export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
       };
       console.log(cleanData);
     } catch (err) {
-      console.log(err);
+      handleError(err);
     }
   };
 
