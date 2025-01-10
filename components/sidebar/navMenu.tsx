@@ -44,11 +44,17 @@ export default function NavMenu() {
             <SelectValue placeholder="Wallet" />
           </SelectTrigger>
           <SelectContent>
-            {walletDropdown.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value.toString()}>
-                {opt.label}
+            {walletDropdown.length ? (
+              walletDropdown.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value.toString()}>
+                  {opt.label}
+                </SelectItem>
+              ))
+            ) : (
+              <SelectItem disabled value="noWallet">
+                No wallet
               </SelectItem>
-            ))}
+            )}
           </SelectContent>
         </Select>
         <p className="text-sm my-1">

@@ -14,7 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CornerUpLeft } from "lucide-react";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { register } from "@/app/actions/auth";
+import { register } from "@/app/actions/authen";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import useStatus from "@/hooks/useStatus";
