@@ -21,7 +21,6 @@ export async function createPartyPayBill(formData: FormData) {
     qrcode: body.qrcode?.path || "",
   });
   if (!validatedFields.success) {
-    console.log(validatedFields.error);
     return {
       error: true,
       message: "Invalid body.",
@@ -45,12 +44,9 @@ export async function createPartyPayBill(formData: FormData) {
     let qrcode = "";
     if (paymentMethod === "qrcode") {
       const qrcodeFile = formData.get("qrcode") as File;
-      if (!qrcodeFile) {
-        return {
-          error: true,
-          message: "Payment method is QR code but missing QR code image.",
-        };
-      }
+      if (!qrcodeFile)
+        throw new Error("Payment method is QR code but missing QR code image.");
+
       const cloudinaryRes = await uploadToCloudinary(qrcodeFile);
       if (cloudinaryRes.error)
         throw new Error("Error on upload to cloudinary.");
@@ -58,16 +54,7 @@ export async function createPartyPayBill(formData: FormData) {
       qrcode = cloudinaryRes.url;
     }
 
-    let generatedPublicId: string;
-    let existedPublicId: PartyBill | null | undefined;
-    do {
-      generatedPublicId = generatePublicId(date);
-      existedPublicId = await prisma?.partyBill.findUnique({
-        where: {
-          billPublicId: generatedPublicId,
-        },
-      });
-    } while (!!existedPublicId);
+    let generatedPublicId: string = generatePublicId(date);
 
     await db.$transaction(async (prisma) => {
       const partyPay = await prisma.partyBill.create({

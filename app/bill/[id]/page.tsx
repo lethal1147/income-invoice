@@ -25,8 +25,7 @@ import PartyPayBillForm from "@/components/form/partyPay/partyPayBillForm";
 
 export default function Page({ params }: { params: { id: string } }) {
   const [isOpen, setIsOpen] = useState(false);
-  const { getPartyPayBillByBillId, billInfo, summaryData } =
-    useMemberBillStore();
+  const { getPartyPayBillByBillId, billInfo } = useMemberBillStore();
   const { isPending, setStatus } = useStatus(apiStatus.PENDING);
 
   useEffect(() => {
@@ -54,7 +53,7 @@ export default function Page({ params }: { params: { id: string } }) {
                   <DialogHeader className="font-bold text-xl pb-5">
                     <DialogTitle>Update party bill</DialogTitle>
                   </DialogHeader>
-                  <PartyPayBillForm setIsOpen={setIsOpen} />
+                  <PartyPayBillForm data={billInfo} setIsOpen={setIsOpen} />
                 </ScrollArea>
               </DialogContent>
             </Dialog>

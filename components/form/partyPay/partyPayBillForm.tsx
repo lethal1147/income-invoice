@@ -25,11 +25,15 @@ import { useSession } from "next-auth/react";
 import { useToast } from "@/components/ui/use-toast";
 import { useForm } from "react-hook-form";
 import { handleError } from "@/utils/utils";
+import { PartyBillTypeWithInclude } from "@/types/partyBillType";
+import { updatePartyPayBill } from "@/app/actions/partyPay/updatePartyPayBill";
 
 export default function PartyPayBillForm({
   setIsOpen,
+  data,
 }: {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  data?: PartyBillTypeWithInclude;
 }) {
   const { data: session } = useSession();
   const form = useForm<CreateBillSchemaType>({
@@ -46,7 +50,9 @@ export default function PartyPayBillForm({
       const formData = new FormData();
       formData.append("body", JSON.stringify(data));
       formData.append("qrcode", data.qrcode as File);
-      const result = await createPartyPayBill(formData);
+      const result = data
+        ? await updatePartyPayBill(formData)
+        : await createPartyPayBill(formData);
       if (result.error) {
         throw new Error(result.message);
       }
@@ -63,7 +69,7 @@ export default function PartyPayBillForm({
   };
 
   useEffect(() => {
-    if (!session?.user?.id) return;
+    if (!session?.user?.id || data) return;
     const resetForm: Partial<CreateBillSchemaType> = {
       userId: session.user.id,
       billMenus: [],
@@ -75,6 +81,34 @@ export default function PartyPayBillForm({
 
     form.reset(resetForm);
   }, [session?.user?.id]);
+
+  useEffect(() => {
+    if (!data) return;
+    const formattedData: Partial<CreateBillSchemaType> = {
+      name: data.name,
+      userId: data.userId,
+      vatFlag: data.vatFlag,
+      date: data.date,
+      paymentMethod: data.paymentMethod,
+      qrcode: data.qrcode,
+      bank: data.bank,
+      bankNumber: data.bankNumber,
+      promptpay: data.promptpay,
+      serviceChargeFlag: data.serviceChargeFlag,
+      billMenus: data.billMenus.map((menu) => ({
+        id: menu.id,
+        quantity: menu.quantity.toString(),
+        pricePerItem: menu.pricePerItem.toString(),
+        name: menu.name,
+      })),
+      member: data.member.map((mem) => ({
+        id: mem.id,
+        name: mem.name,
+      })),
+    };
+
+    form.reset(formattedData);
+  }, [data]);
 
   return (
     <Form {...form}>

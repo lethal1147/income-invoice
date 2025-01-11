@@ -5,6 +5,7 @@ export type PaymentMethodType = "promptpay" | "bank" | "qrcode";
 export const paymentMethodEnum = z.enum(["promptpay", "bank", "qrcode"]);
 
 export const billMenu = z.object({
+  id: z.string().optional(),
   quantity: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
     message: "Expected number, received a string",
   }),
@@ -14,10 +15,14 @@ export const billMenu = z.object({
   name: z.string().min(1),
 });
 
-export const billMember = z.object({ name: z.string() });
+export const billMember = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+});
 
 export const createBillSchema = z.discriminatedUnion("paymentMethod", [
   z.object({
+    id: z.string().optional(),
     name: z.string(),
     date: z.date(),
     userId: z.string(),
@@ -59,6 +64,7 @@ export const createBillSchema = z.discriminatedUnion("paymentMethod", [
     member: z.array(billMember).min(1),
   }),
   z.object({
+    id: z.string().optional(),
     name: z.string(),
     date: z.date(),
     userId: z.string(),
@@ -89,6 +95,7 @@ export const createBillSchema = z.discriminatedUnion("paymentMethod", [
     member: z.array(billMember).min(1),
   }),
   z.object({
+    id: z.string().optional(),
     name: z.string(),
     date: z.date(),
     userId: z.string(),

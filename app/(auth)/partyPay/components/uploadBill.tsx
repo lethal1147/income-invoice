@@ -44,8 +44,9 @@ export default function UploadBill({ form }: UploadBillPropsType) {
       if (res && res?.error) {
         throw new Error(res.message);
       }
-      console.log(res);
-      form.setValue("billMenus", res?.menus || []);
+      const oldMenus = form.getValues("billMenus");
+      const updated = [...oldMenus, ...res?.menus];
+      form.setValue("billMenus", updated || []);
       setFormOpen(false);
     } catch (err) {
       handleError(err);
