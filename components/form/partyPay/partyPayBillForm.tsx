@@ -40,7 +40,7 @@ export default function PartyPayBillForm({
     resolver: zodResolver(createBillSchema),
   });
   const { setStatus, isPending } = useStatus(apiStatus.IDLE);
-  const { getPartyBillCalendar } = usePartyBillStore();
+  const { getPartyBillCalendar, getPartyPayBillByBillId } = usePartyBillStore();
   const { toast } = useToast();
 
   const onSubmit = async (data: CreateBillSchemaType) => {
@@ -50,16 +50,25 @@ export default function PartyPayBillForm({
       const formData = new FormData();
       formData.append("body", JSON.stringify(data));
       formData.append("qrcode", data.qrcode as File);
-      const result = data
-        ? await updatePartyPayBill(formData)
-        : await createPartyPayBill(formData);
-      if (result.error) {
-        throw new Error(result.message);
+      if (data) {
+        const result = await updatePartyPayBill(formData);
+        if (result.error) {
+          throw new Error(result.message);
+        }
+        toast({
+          title: "✅ Update transaction successfully!",
+        });
+        getPartyPayBillByBillId(data.id);
+      } else {
+        const result = await createPartyPayBill(formData);
+        if (result.error) {
+          throw new Error(result.message);
+        }
+        toast({
+          title: "✅ Create transaction successfully!",
+        });
+        getPartyBillCalendar(session.user.id);
       }
-      toast({
-        title: "✅ Create transaction successfully!",
-      });
-      getPartyBillCalendar(session.user.id);
       setStatus(apiStatus.SUCCESS);
       setIsOpen(false);
     } catch (err) {
