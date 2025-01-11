@@ -13,33 +13,44 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { customStyles } from "@/configs/style";
 import { cn } from "@/lib/utils";
-import { memberBillSchema, MemberBillSchemaType } from "@/schema/memberBill";
+import {
+  memberBillSchema,
+  MemberBillSchemaType,
+  MemberMenusSchemaType,
+} from "@/schema/memberBill";
 import useMemberBillStore from "@/stores/memberBillStore";
-import { OptionType } from "@/types/utilsType";
 import { formatCurrencyThaiBath } from "@/utils/formatter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, X } from "lucide-react";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { handleError } from "@/utils/utils";
+import { handleError, handleSuccess } from "@/utils/utils";
+import useStatus from "@/hooks/useStatus";
+import { apiStatus } from "@/constant/status";
+import Loader from "@/components/common/loader";
+import { BillMemberWithInclude } from "@/types/partyBillType";
 
 type MemberFormPropsType = {
   memberId: string;
   billId: string;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+  member: BillMemberWithInclude;
 };
 
-export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
+export default function MemberForm({
+  memberId,
+  billId,
+  setIsOpen,
+  member,
+}: MemberFormPropsType) {
   const form = useForm<MemberBillSchemaType>({
     resolver: zodResolver(memberBillSchema),
     defaultValues: {
@@ -56,7 +67,9 @@ export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
     getMenusByBillId,
     menus: menuList,
     billInfo,
+    submitMemberMenu,
   } = useMemberBillStore();
+  const { isPending, setStatus } = useStatus(apiStatus.IDLE);
   const selectedMenu = form.watch("menus")?.map((mn) => mn.menuId);
   const menusForm = form.watch("menus");
   const newTotal = menusForm.reduce((acc, cur) => {
@@ -73,20 +86,36 @@ export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
 
   const onSubmit = async (data: MemberBillSchemaType) => {
     try {
+      setStatus(apiStatus.PENDING);
       const cleanData = {
         ...data,
         menus: data.menus.filter((menu) => menu.menuId),
       };
-      console.log(cleanData);
+      const message = await submitMemberMenu(cleanData);
+      setStatus(apiStatus.SUCCESS);
+      handleSuccess(message);
     } catch (err) {
-      handleError(err);
+      handleError(err, {
+        duration: 3000,
+        onDismiss: () => setIsOpen(false),
+        onAutoClose: () => setIsOpen(false),
+      });
+      setStatus(apiStatus.ERROR);
     }
   };
 
   useEffect(() => {
     if (!memberId || !billId) return;
+    let menus: MemberMenusSchemaType[] = [];
+    if (member.memberMenus.length > 0) {
+      menus = member.memberMenus.map((menu) => ({
+        id: menu.id,
+        menuId: menu.billMenuId,
+        quantity: menu.quantity.toString(),
+      }));
+    }
     const resetForm: Partial<MemberBillSchemaType> = {
-      menus: [],
+      menus: menus,
       memberId,
     };
     form.reset(resetForm);
@@ -132,6 +161,7 @@ export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
                           <FormItem>
                             <FormLabel>Menu name</FormLabel>
                             <Select
+                              disabled={isPending}
                               onValueChange={field.onChange}
                               value={field.value}
                             >
@@ -176,6 +206,7 @@ export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
                             <FormLabel>Quantity</FormLabel>
                             <FormControl>
                               <Input
+                                disabled={isPending}
                                 max={menuData?.quantity}
                                 type="number"
                                 {...field}
@@ -191,6 +222,7 @@ export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
                         {formatCurrencyThaiBath(total || 0)}
                       </p>
                       <Button
+                        disabled={isPending}
                         onClick={() => menus.remove(index)}
                         type="button"
                         className="bg-red-500 hover:bg-red-500/80 p-0.5 my-2 size-6 self-end"
@@ -204,6 +236,7 @@ export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
 
               {menus.fields.length < menuList.length && (
                 <Button
+                  disabled={isPending}
                   onClick={() =>
                     menus.append({
                       menuId: "",
@@ -229,10 +262,12 @@ export default function MemberForm({ memberId, billId }: MemberFormPropsType) {
         </div>
 
         <div className="flex justify-end gap-5">
-          <Button type="button" variant="outline">
+          <Button disabled={isPending} type="button" variant="outline">
             Cancel
           </Button>
-          <Button type="submit">Save</Button>
+          <Button disabled={isPending} type="submit">
+            Save
+          </Button>
         </div>
       </form>
     </Form>

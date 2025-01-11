@@ -6,14 +6,21 @@ import { handleError } from "@/utils/utils";
 import { Link } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
-export default function CopyButton() {
-  const [text, setText] = useState("Share");
+type CopyButtonProps = {
+  text: string;
+  customLink?: string;
+};
+
+export default function CopyButton({
+  text: customText,
+  customLink,
+}: CopyButtonProps) {
+  const [text, setText] = useState<string>(customText);
   const [copying, setCopying] = useState(false);
 
   useEffect(() => {
     if (copying) {
       const timer = setTimeout(() => {
-        console.log("test");
         setText("Share");
         setCopying(false);
       }, 3000);
@@ -24,7 +31,7 @@ export default function CopyButton() {
 
   const onClickCopy = async () => {
     if (typeof window === "undefined") return;
-    const url = window.location.href;
+    const url = customLink ?? window.location.href;
     try {
       await navigator.clipboard.writeText(url);
       setText("Copied!");

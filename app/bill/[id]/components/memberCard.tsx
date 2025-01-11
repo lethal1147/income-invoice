@@ -15,19 +15,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { MemberBillSchemaType } from "@/schema/memberBill";
-import { BillMembers } from "@prisma/client";
-import React from "react";
+import React, { useState } from "react";
 import MemberForm from "./memberForm";
+import { BillMemberWithInclude } from "@/types/partyBillType";
 
 type MemberCardPropsType = {
-  member: BillMembers;
+  member: BillMemberWithInclude;
   billId: string;
 };
 
 export default function MemberCard({ member, billId }: MemberCardPropsType) {
+  const [isOpen, setIsOpen] = useState(false);
   return (
-    <Dialog>
+    <Dialog onOpenChange={setIsOpen} open={isOpen}>
       <DialogTrigger asChild>
         <Card className="col-span-1 bg-gray-200 h-auto hover:scale-105 transition shadow-md">
           <CardHeader>
@@ -45,7 +45,12 @@ export default function MemberCard({ member, billId }: MemberCardPropsType) {
           <DialogTitle>{member.name}</DialogTitle>
           <DialogDescription>total : 10000</DialogDescription>
         </DialogHeader>
-        <MemberForm billId={billId} memberId={member.id} />
+        <MemberForm
+          member={member}
+          setIsOpen={setIsOpen}
+          billId={billId}
+          memberId={member.id}
+        />
       </DialogContent>
     </Dialog>
   );

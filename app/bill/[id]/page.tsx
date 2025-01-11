@@ -42,22 +42,22 @@ export default function Page({ params }: { params: { id: string } }) {
         <div className=" w-[600px] bg-gray-200 px-5 py-3 rounded-md flex flex-col gap-2">
           <div className="flex justify-between items-center">
             <h1 className="font-bold text-2xl">{billInfo?.name}</h1>
-            <Dialog>
-              <DialogTrigger></DialogTrigger>
+            <Dialog onOpenChange={setIsOpen} open={isOpen}>
+              <DialogTrigger>
+                <Wrench
+                  className="hover:text-green-main transition cursor-pointer"
+                  size={25}
+                />
+              </DialogTrigger>
               <DialogContent className="min-w-[800px]">
                 <ScrollArea className="max-h-[600px] px-5">
                   <DialogHeader className="font-bold text-xl pb-5">
-                    <DialogTitle>Create party bill</DialogTitle>
+                    <DialogTitle>Update party bill</DialogTitle>
                   </DialogHeader>
-                  <DialogDescription>Bill information</DialogDescription>
                   <PartyPayBillForm setIsOpen={setIsOpen} />
                 </ScrollArea>
               </DialogContent>
             </Dialog>
-            <Wrench
-              className="hover:text-green-main transition cursor-pointer"
-              size={25}
-            />
           </div>
           <h2>{dayjs(billInfo?.date).format("DD MMMM YYYY")}</h2>
 
@@ -126,7 +126,7 @@ export default function Page({ params }: { params: { id: string } }) {
         <div className="w-full">
           <div className="flex justify-between w-full pb-5">
             <h3 className="font-bold text-2xl">Members</h3>
-            <CopyButton />
+            <CopyButton text="Share" />
           </div>
           <ScrollArea>
             <div className="w-full grow grid grid-cols-3 p-3 gap-5">

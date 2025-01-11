@@ -70,6 +70,7 @@ export default function UploadBill({ form }: UploadBillPropsType) {
           For automatic generate bill menus.
         </DialogDescription>
         <Input
+          disabled={isPending}
           onChange={onSelectFile}
           accept="image/png, image/jpeg"
           type="file"
