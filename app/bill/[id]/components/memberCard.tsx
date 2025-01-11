@@ -26,13 +26,18 @@ type MemberCardPropsType = {
 
 export default function MemberCard({ member, billId }: MemberCardPropsType) {
   const [isOpen, setIsOpen] = useState(false);
+  const total = member.memberMenus.reduce(
+    (acc, cur) => acc + cur.billMenu.pricePerItem * cur.quantity,
+    0
+  );
+
   return (
     <Dialog onOpenChange={setIsOpen} open={isOpen}>
       <DialogTrigger asChild>
         <Card className="col-span-1 bg-gray-200 h-auto hover:scale-105 transition shadow-md">
           <CardHeader>
             <CardTitle className="text-green-main">{member.name}</CardTitle>
-            <CardDescription>Total : 10000</CardDescription>
+            <CardDescription>Total : {total}</CardDescription>
           </CardHeader>
           <CardContent>
             <p>{member.status}</p>

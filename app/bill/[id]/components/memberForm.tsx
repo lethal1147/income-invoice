@@ -94,11 +94,10 @@ export default function MemberForm({
       const message = await submitMemberMenu(cleanData);
       setStatus(apiStatus.SUCCESS);
       handleSuccess(message);
+      setIsOpen(false);
     } catch (err) {
       handleError(err, {
         duration: 3000,
-        onDismiss: () => setIsOpen(false),
-        onAutoClose: () => setIsOpen(false),
       });
       setStatus(apiStatus.ERROR);
     }

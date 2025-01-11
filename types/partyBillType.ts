@@ -8,5 +8,9 @@ export interface PartyBillTypeWithInclude extends PartyBill {
 export type PartyBillCalendar = Record<string, { id: string; name: string }[]>;
 
 export interface BillMemberWithInclude extends BillMembers {
-  memberMenus: MemberMenus[];
+  memberMenus: MemberMenusWithInclude[];
+}
+
+export interface MemberMenusWithInclude extends MemberMenus {
+  billMenu: BillMenus;
 }

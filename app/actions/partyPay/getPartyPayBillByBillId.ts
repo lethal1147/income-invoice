@@ -10,7 +10,13 @@ export async function getPartyPayBillByBillId(billId: string) {
     const partyBill = await prisma?.partyBill.findUnique({
       include: {
         billMembers: {
-          include: { memberMenus: true },
+          include: {
+            memberMenus: {
+              include: {
+                billMenu: true,
+              },
+            },
+          },
         },
         billMenus: true,
       },
