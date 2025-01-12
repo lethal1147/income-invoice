@@ -1,4 +1,4 @@
-'use server'
+"use server";
 
 import { formatErrorMessage } from "@/utils/formatter";
 import dayjs from "dayjs";
@@ -24,11 +24,8 @@ export async function getSummaryTags(
         totalIncome: 0,
         totalExpense: 0,
       };
-    const startDate = dayjs(filter.startDate)
-      .startOf("day")
-      .add(7, "hour")
-      .toDate();
-    const endDate = dayjs(filter.endDate).endOf("day").add(7, "hour").toDate();
+    const startDate = dayjs(filter.startDate).startOf("day").toDate();
+    const endDate = dayjs(filter.endDate).endOf("day").toDate();
 
     const result: ReturnOfSummaryTag[] = await prisma.$queryRaw`
     SELECT t."name" AS tagName, CAST(SUM(e.total) AS INTEGER) AS totalAmount FROM "Expense" e

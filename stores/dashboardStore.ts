@@ -40,7 +40,7 @@ const useDashboardStore = create<DashboardState>((set, get) => ({
     totalExpense: 0,
     totalSave: 0,
   },
-  year: 2024,
+  year: dayjs().year(),
   fetchExpenseData: async (userId: string) => {
     try {
       const year = get().year;

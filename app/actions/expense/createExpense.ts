@@ -1,10 +1,11 @@
-'use server'
+"use server";
 
 import { db } from "@/lib/db";
 import {
   createExpenseBodySchema,
   CreateExpenseBodySchema,
 } from "@/schema/expense";
+import dayjs from "dayjs";
 import { formatErrorMessage } from "@/utils/formatter";
 
 export async function createExpense(body: CreateExpenseBodySchema) {
@@ -64,13 +65,14 @@ export async function createExpense(body: CreateExpenseBodySchema) {
         }
       }
 
+      const dateThai = dayjs(date).add(7, "hour").toDate();
       const newExpense = await prisma.expense.create({
         data: {
           title: name,
           description: description || "",
           total: +total || 0,
           type,
-          date,
+          date: dateThai,
           userId,
           walletId,
         },

@@ -27,6 +27,7 @@ import { useForm } from "react-hook-form";
 import { handleError } from "@/utils/utils";
 import { PartyBillTypeWithInclude } from "@/types/partyBillType";
 import { updatePartyPayBill } from "@/app/actions/partyPay/updatePartyPayBill";
+import useMemberBillStore from "@/stores/memberBillStore";
 
 export default function PartyPayBillForm({
   setIsOpen,
@@ -40,7 +41,8 @@ export default function PartyPayBillForm({
     resolver: zodResolver(createBillSchema),
   });
   const { setStatus, isPending } = useStatus(apiStatus.IDLE);
-  const { getPartyBillCalendar, getPartyPayBillByBillId } = usePartyBillStore();
+  const { getPartyBillCalendar } = usePartyBillStore();
+  const { getPartyPayBillByBillId } = useMemberBillStore();
   const { toast } = useToast();
 
   const onSubmit = async (data: CreateBillSchemaType) => {
@@ -58,7 +60,7 @@ export default function PartyPayBillForm({
         toast({
           title: "✅ Update transaction successfully!",
         });
-        getPartyPayBillByBillId(data.id);
+        getPartyPayBillByBillId(data.id as string);
       } else {
         const result = await createPartyPayBill(formData);
         if (result.error) {

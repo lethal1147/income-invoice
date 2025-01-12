@@ -1,8 +1,12 @@
-'use server'
+"use server";
 
 import { db } from "@/lib/db";
-import { createExpenseBodySchema, CreateExpenseBodySchema } from "@/schema/expense";
+import {
+  createExpenseBodySchema,
+  CreateExpenseBodySchema,
+} from "@/schema/expense";
 import { formatErrorMessage } from "@/utils/formatter";
+import dayjs from "dayjs";
 
 export async function updateExpenseById(
   id: string,
@@ -105,7 +109,7 @@ export async function updateExpenseById(
           },
         });
       }
-
+      const dateThai = dayjs(date).add(7, "hour").toDate();
       await prisma.expense.update({
         where: {
           id,
@@ -115,7 +119,7 @@ export async function updateExpenseById(
           description: description || "",
           total: +total || 0,
           type,
-          date,
+          date: dateThai,
           userId,
           walletId,
         },
