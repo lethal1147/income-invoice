@@ -31,7 +31,7 @@ export default function Home() {
   const onSubmit = form.handleSubmit(async (data) => {
     setStatus(apiStatus.PENDING);
     const response = await login(data);
-    if (response.error) {
+    if (response?.error) {
       setStatus(apiStatus.ERROR);
     } else {
       setStatus(apiStatus.SUCCESS);

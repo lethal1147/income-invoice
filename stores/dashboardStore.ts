@@ -1,3 +1,5 @@
+"use client";
+
 import { getExpenseSummary, getSummaryTags } from "@/app/actions/expense";
 import { ExpenseSummaryDataType } from "@/types/expenseType";
 import { CurrentFilterStateType } from "@/types/utilsType";

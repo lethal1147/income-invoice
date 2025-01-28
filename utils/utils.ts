@@ -1,3 +1,5 @@
+"use client";
+
 import { ExternalToast, toast } from "sonner";
 
 export async function handleError(error: unknown, options?: ExternalToast) {

@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { createBillSchema } from "@/schema/partyBill";
 import { uploadToCloudinary } from "@/services/cloudinary";
 import { formatErrorMessage, generatePublicId } from "@/utils/formatter";
-import { handleError } from "@/utils/utils";
+// import { handleError } from "@/utils/utils";
 import { PartyBill, PaymentMethod } from "@prisma/client";
 import dayjs from "dayjs";
 
@@ -98,7 +98,7 @@ export async function createPartyPayBill(formData: FormData) {
 
     return { error: false, message: "Create new party pay successfully." };
   } catch (err) {
-    handleError(err);
+    // handleError(err);
     return { error: true, message: formatErrorMessage(err) };
   }
 }

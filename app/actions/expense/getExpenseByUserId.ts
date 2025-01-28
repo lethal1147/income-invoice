@@ -3,7 +3,7 @@
 import { db } from "@/lib/db";
 import { ExpenseQueryOption } from "@/types/expenseType";
 import { formatErrorMessage } from "@/utils/formatter";
-import { handleError } from "@/utils/utils";
+// import { handleError } from "@/utils/utils";
 import { Prisma } from "@prisma/client";
 import dayjs from "dayjs";
 
@@ -70,7 +70,7 @@ export async function getExpenseByUserId(
       total: totalExpenses,
     };
   } catch (err) {
-    handleError(err);
+    // handleError(err);
     return { error: true, message: formatErrorMessage(err) };
   }
 }

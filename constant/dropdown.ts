@@ -2,6 +2,10 @@ import { OptionType } from "@/types/utilsType";
 
 export const EXPENSE_TYPE_DROPDOWNS = [
   {
+    label: "All",
+    value: "",
+  },
+  {
     label: "Expense",
     value: "e",
   },

@@ -1,3 +1,5 @@
+"use client";
+
 import { getPartyPayBillByUserId } from "@/app/actions/partyPay/";
 import { PartyBillCalendar } from "@/types/partyBillType";
 import { handleError } from "@/utils/utils";

@@ -52,7 +52,8 @@ export default function PartyPayBillForm({
       const formData = new FormData();
       formData.append("body", JSON.stringify(data));
       formData.append("qrcode", data.qrcode as File);
-      if (data) {
+      if (data.id) {
+        console.log("data", data);
         const result = await updatePartyPayBill(formData);
         if (result.error) {
           throw new Error(result.message);
@@ -96,6 +97,7 @@ export default function PartyPayBillForm({
   useEffect(() => {
     if (!data) return;
     const formattedData: Partial<CreateBillSchemaType> = {
+      id: data.id,
       name: data.name,
       userId: data.userId,
       vatFlag: data.vatFlag,

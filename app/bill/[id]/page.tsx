@@ -27,7 +27,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const [isOpen, setIsOpen] = useState(false);
   const { getPartyPayBillByBillId, billInfo } = useMemberBillStore();
   const { isPending, setStatus } = useStatus(apiStatus.PENDING);
-
+  console.log(billInfo);
   useEffect(() => {
     if (!params.id) return;
     getPartyPayBillByBillId(params.id);
@@ -53,7 +53,10 @@ export default function Page({ params }: { params: { id: string } }) {
                   <DialogHeader className="font-bold text-xl pb-5">
                     <DialogTitle>Update party bill</DialogTitle>
                   </DialogHeader>
-                  <PartyPayBillForm data={billInfo} setIsOpen={setIsOpen} />
+                  <PartyPayBillForm
+                    data={billInfo || undefined}
+                    setIsOpen={setIsOpen}
+                  />
                 </ScrollArea>
               </DialogContent>
             </Dialog>
